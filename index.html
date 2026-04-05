@@ -2,74 +2,71 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SA Master Hub v19 | FINAL STABLE</title>
+    <title>SA Master Hub v20 | ATOMIC STABILITY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .level-tab.active { border-bottom: 4px solid #3b82f6; color: #3b82f6; font-weight: bold; background: #eff6ff; }
-        .sidebar-item.active { background: #334155; border-left: 4px solid #3b82f6; color: white; }
-        .artifact-card { border-left: 4px solid #10b981; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 1000; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
+        .active-tab { border-bottom: 4px solid #3b82f6; color: #3b82f6; background: #eff6ff; font-weight: 900; }
+        .active-proj { background: #334155; border-left: 4px solid #3b82f6; color: white; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
+        .modal.open { display: flex; }
     </style>
 </head>
 <body class="bg-slate-100 flex h-screen overflow-hidden font-sans text-slate-900">
 
-    <div id="auth-screen" class="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center">
-        <div class="bg-white p-10 rounded-3xl shadow-2xl w-[400px] text-center">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-widest text-slate-800">SA Hub v19</h2>
-            <input type="text" id="login-input" placeholder="Ваше имя" class="w-full mb-4 p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="app.login()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition uppercase">Войти</button>
+    <div id="auth" class="fixed inset-0 bg-slate-900 z-[10000] flex items-center justify-center">
+        <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
+            <h2 class="text-2xl font-black mb-6 uppercase italic">SA Hub v20</h2>
+            <input type="text" id="user-input" placeholder="Введите имя" class="w-full mb-4 p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold uppercase tracking-widest">Войти</button>
         </div>
     </div>
 
-    <aside class="w-80 bg-slate-800 text-slate-300 flex flex-col hidden shadow-2xl" id="sidebar">
+    <aside class="w-72 bg-slate-800 text-slate-300 flex flex-col hidden" id="sidebar">
         <div class="p-6 border-b border-slate-700">
-            <h1 class="text-xl font-bold text-white tracking-tight">SA Operating Hub</h1>
-            <div id="user-tag" class="text-[10px] text-blue-400 mt-1 uppercase font-black"></div>
+            <div class="text-xs font-black text-blue-400 uppercase mb-1" id="user-tag"></div>
+            <h1 class="text-lg font-bold text-white">SA Operating Hub</h1>
         </div>
-        <div class="p-4 flex-1 overflow-y-auto">
-            <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Проекты</div>
-            <nav id="project-list" class="space-y-1"></nav>
-            <button onclick="app.addProject()" class="w-full mt-6 border-2 border-dashed border-slate-600 p-4 rounded-xl text-[10px] font-bold hover:text-white hover:border-blue-400 transition uppercase">+ НОВЫЙ ПРОЕКТ</button>
+        <div class="flex-1 overflow-y-auto p-4">
+            <div class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Проекты</div>
+            <div id="proj-list" class="space-y-1"></div>
+            <button onclick="addProject()" class="w-full mt-6 border-2 border-dashed border-slate-600 p-4 rounded-xl text-[10px] font-bold hover:border-blue-500 hover:text-white transition uppercase">
+                + НОВЫЙ ПРОЕКТ
+            </button>
         </div>
-        <div class="p-4 bg-slate-900/40 border-t border-slate-700">
-            <button onclick="app.toggleModal(true)" class="w-full bg-slate-700 p-4 rounded-xl text-[10px] font-bold uppercase hover:bg-blue-600 transition">NJK БИБЛИОТЕКА</button>
+        <div class="p-4 bg-slate-900/50">
+            <button onclick="toggleTplModal(true)" class="w-full bg-slate-700 p-4 rounded-xl text-[10px] font-bold uppercase hover:bg-blue-600 transition">Библиотека NJK</button>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col hidden" id="main">
-        <header class="bg-white border-b p-4 flex justify-between items-center px-8 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-700" id="cur-project-name">Проект не выбран</h2>
-            <div class="flex gap-3">
-                <button onclick="app.exportJSON()" class="text-[10px] font-bold border px-4 py-2 rounded-lg hover:bg-slate-50 transition">JSON</button>
-                <button onclick="app.saveData()" class="text-[10px] font-bold bg-blue-600 text-white px-6 py-2 rounded-lg uppercase shadow-lg hover:bg-blue-700 transition">Сохранить</button>
+        <header class="bg-white border-b p-4 flex justify-between items-center px-8">
+            <h2 class="font-bold text-slate-700 uppercase text-sm" id="active-p-name">Проект не выбран</h2>
+            <div class="flex gap-2">
+                <button onclick="exportJSON()" class="text-[10px] font-bold border px-4 py-2 rounded-lg hover:bg-slate-100 uppercase">JSON</button>
+                <button onclick="saveProjectData()" class="text-[10px] font-bold bg-blue-600 text-white px-6 py-2 rounded-lg uppercase shadow-lg hover:bg-blue-700">Сохранить</button>
             </div>
         </header>
-        <div class="flex bg-white border-b overflow-x-auto" id="tabs"></div>
-        <section class="flex-1 overflow-y-auto p-10 bg-slate-50" id="editor-zone">
-            <div id="fields-container" class="max-w-4xl space-y-6 pb-20"></div>
-        </section>
+        <div class="flex bg-white border-b" id="tab-bar"></div>
+        <div class="flex-1 overflow-y-auto p-10 bg-slate-50" id="editor"></div>
     </main>
 
     <div id="tpl-modal" class="modal">
-        <div class="bg-white w-[90%] h-[85vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+        <div class="bg-white w-[95%] h-[90vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl">
             <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-                <h3 class="font-black uppercase text-slate-700 tracking-widest">NJK Templates</h3>
-                <button onclick="app.toggleModal(false)" class="text-2xl hover:text-red-500 transition px-4">&times;</button>
+                <span class="font-black uppercase text-slate-500">Nunjucks Editor</span>
+                <button onclick="toggleTplModal(false)" class="text-3xl hover:text-red-500 px-4">&times;</button>
             </div>
             <div class="flex-1 flex overflow-hidden">
-                <div class="w-72 border-r p-4 bg-slate-50 overflow-y-auto" id="tpl-sidebar"></div>
-                <div class="flex-1 p-8 flex flex-col space-y-4">
-                    <div class="grid grid-cols-2 gap-6">
-                        <input type="text" id="f-tpl-title" placeholder="Название шаблона" class="p-4 border rounded-2xl text-sm outline-none">
-                        <input type="text" id="f-tpl-file" placeholder="filename.njk" class="p-4 border rounded-2xl text-sm font-mono">
+                <div class="w-64 border-r p-4 bg-slate-50 overflow-y-auto" id="tpl-list-side"></div>
+                <div class="flex-1 p-8 flex flex-col gap-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="tpl-in-title" placeholder="Имя шаблона" class="p-4 border rounded-xl text-sm outline-none">
+                        <input type="text" id="tpl-in-file" placeholder="file.njk" class="p-4 border rounded-xl text-sm font-mono outline-none">
                     </div>
-                    <textarea id="f-tpl-content" class="flex-1 p-6 border rounded-2xl font-mono text-xs bg-slate-900 text-green-400 outline-none leading-relaxed shadow-inner"></textarea>
-                    <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
-                        <div class="flex gap-6">
-                            <button onclick="app.deleteTemplate()" id="btn-del-tpl" class="text-red-500 font-bold text-[10px] uppercase hidden hover:underline">Удалить шаблон</button>
-                        </div>
-                        <button onclick="app.saveTemplate()" class="bg-blue-600 text-white px-12 py-4 rounded-2xl font-bold uppercase text-xs shadow-xl hover:bg-blue-700">Сохранить шаблон</button>
+                    <textarea id="tpl-in-body" class="flex-1 p-6 border rounded-xl font-mono text-xs bg-slate-900 text-green-400 outline-none shadow-inner"></textarea>
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+                        <button onclick="deleteTemplate()" id="tpl-del-btn" class="text-red-500 font-bold text-[10px] uppercase hidden hover:underline">Удалить шаблон</button>
+                        <button onclick="saveTemplate()" class="bg-blue-600 text-white px-12 py-4 rounded-xl font-bold uppercase text-[10px] hover:bg-blue-700 ml-auto">Сохранить</button>
                     </div>
                 </div>
             </div>
@@ -77,232 +74,238 @@
     </div>
 
 <script>
-    // КОНФИГУРАЦИЯ
-    const CONFIG = [
+    // 1. КОНФИГУРАЦИЯ (Sychronized with Level 1 MD)
+    const LEVELS = [
         { n: 1, title: "BUSINESS STRATEGY", q: "Зачем мы это делаем?", fields: [
-            {name: "Business Vision"}, {name: "Business Goals", isArray: true}, 
-            {name: "Business Objectives", isArray: true}, {name: "KPIs / Success Metrics", isArray: true},
-            {name: "Business Constraints", isArray: true}, {name: "Priorities / Trade-offs", isArray: true},
-            {name: "Success Criteria"}, {name: "Decision Rules", isArray: true}
+            {id: "vision", name: "Business Vision"}, 
+            {id: "goals", name: "Business Goals", isArray: true},
+            {id: "objectives", name: "Business Objectives", isArray: true},
+            {id: "kpi", name: "KPIs / Success Metrics", isArray: true},
+            {id: "constraints", name: "Business Constraints", isArray: true},
+            {id: "tradeoffs", name: "Priorities / Trade-offs", isArray: true},
+            {id: "success", name: "Success Criteria"},
+            {id: "decision", name: "Decision Rules", isArray: true}
         ]},
         { n: 2, title: "BUSINESS REQUIREMENTS", q: "Что нужно бизнесу?", fields: [
-            {name: "Stakeholders", isArray: true}, {name: "Context / Scope"}, {name: "Business Rules", isArray: true}
-        ]},
-        { n: 3, title: "BUSINESS PROCESSES", q: "Как выглядит процесс?", fields: [
-            {name: "BPMN Diagrams", isArtifact: true, isArray: true}, {name: "Happy Path"}
-        ]},
-        { n: 4, title: "PRODUCT REQUIREMENTS", q: "Функционал?", fields: [
-            {name: "User Stories", isArray: true}, {name: "Functional Req", isArray: true}, {name: "UI/UX Mockups", isArtifact: true, isArray: true}
+            {id: "stakeholders", name: "Stakeholders", isArray: true},
+            {id: "scope", name: "Context / Scope"},
+            {id: "rules", name: "Business Rules", isArray: true}
         ]}
     ];
 
-    // ГЛОБАЛЬНЫЙ КЛАСС ПРИЛОЖЕНИЯ
-    const app = {
-        state: {
-            user: localStorage.getItem('sa_user') || null,
-            projects: [],
-            templates: [],
-            activeId: localStorage.getItem('sa_active_id') || null,
-            activeLvl: 1,
-            editTplId: null
-        },
-
-        init() {
-            if (!this.state.user) return;
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('main').classList.remove('hidden');
-            document.getElementById('user-tag').innerText = `Analyst: ${this.state.user}`;
-
-            this.state.projects = JSON.parse(localStorage.getItem(`p_${this.state.user}`)) || [];
-            this.state.templates = JSON.parse(localStorage.getItem(`t_${this.state.user}`)) || [
-                {id: 't1', title: 'Default Spec', file: 'spec.njk', content: '# {{name}}'}
-            ];
-
-            this.renderSidebar();
-            this.renderTabs();
-            if (this.state.activeId) this.selectProject(this.state.activeId);
-        },
-
-        login() {
-            const val = document.getElementById('login-input').value;
-            if (!val) return;
-            localStorage.setItem('sa_user', val);
-            location.reload();
-        },
-
-        // ПРОЕКТЫ
-        addProject() {
-            const name = prompt("Название проекта:");
-            if (!name) return;
-            const newP = { id: 'p' + Date.now(), name: name, data: {} };
-            const list = JSON.parse(localStorage.getItem(`p_${this.state.user}`)) || [];
-            list.push(newP);
-            localStorage.setItem(`p_${this.state.user}`, JSON.stringify(list));
-            localStorage.setItem('sa_active_id', newP.id);
-            location.reload(); // Принудительный сброс для стабильности
-        },
-
-        deleteProject(id) {
-            if (!confirm("Удалить проект?")) return;
-            let list = JSON.parse(localStorage.getItem(`p_${this.state.user}`)) || [];
-            list = list.filter(x => x.id !== id);
-            localStorage.setItem(`p_${this.state.user}`, JSON.stringify(list));
-            if (localStorage.getItem('sa_active_id') === id) localStorage.removeItem('sa_active_id');
-            location.reload();
-        },
-
-        selectProject(id) {
-            this.state.activeId = id;
-            localStorage.setItem('sa_active_id', id);
-            const p = this.state.projects.find(x => x.id === id);
-            if (!p) return;
-            document.getElementById('cur-project-name').innerText = p.name;
-            this.renderSidebar();
-            this.loadLevel(this.state.activeLvl);
-        },
-
-        // ШАБЛОНЫ
-        saveTemplate() {
-            const t = document.getElementById('f-tpl-title').value;
-            const f = document.getElementById('f-tpl-file').value;
-            const c = document.getElementById('f-tpl-content').value;
-            if (!t || !f) return alert("Заполните поля");
-
-            let list = JSON.parse(localStorage.getItem(`t_${this.state.user}`)) || [];
-            if (this.state.editTplId) {
-                const idx = list.findIndex(x => x.id === this.state.editTplId);
-                list[idx] = { id: this.state.editTplId, title: t, file: f, content: c };
-            } else {
-                list.push({ id: 't' + Date.now(), title: t, file: f, content: c });
-            }
-            localStorage.setItem(`t_${this.state.user}`, JSON.stringify(list));
-            location.reload();
-        },
-
-        deleteTemplate() {
-            if (!this.state.editTplId || !confirm("Удалить шаблон?")) return;
-            let list = JSON.parse(localStorage.getItem(`t_${this.state.user}`)) || [];
-            list = list.filter(x => x.id !== this.state.editTplId);
-            localStorage.setItem(`t_${this.state.user}`, JSON.stringify(list));
-            location.reload();
-        },
-
-        // UI RENDERING
-        renderSidebar() {
-            const el = document.getElementById('project-list');
-            el.innerHTML = this.state.projects.map(p => `
-                <div onclick="app.selectProject('${p.id}')" class="sidebar-item p-3 rounded-xl cursor-pointer text-[10px] font-bold uppercase flex justify-between items-center ${this.state.activeId === p.id ? 'active' : ''}">
-                    <span class="truncate">📄 ${p.name}</span>
-                    <button onclick="event.stopPropagation(); app.deleteProject('${p.id}')" class="text-red-400 hover:text-white px-2">×</button>
-                </div>
-            `).join('');
-        },
-
-        renderTabs() {
-            document.getElementById('tabs').innerHTML = CONFIG.map(l => `
-                <button onclick="app.loadLevel(${l.n})" class="level-tab px-6 py-4 text-[10px] font-black uppercase l-btn-${l.n}">L${l.n}</button>
-            `).join('');
-        },
-
-        loadLevel(n) {
-            this.state.activeLvl = n;
-            document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.l-btn-${n}`).classList.add('active');
-
-            const lvl = CONFIG.find(x => x.n === n);
-            const p = this.state.projects.find(x => x.id === this.state.activeId);
-            const container = document.getElementById('fields-container');
-            container.innerHTML = `<h3 class="text-2xl font-black">${lvl.title}</h3><p class="text-orange-600 italic mb-6">${lvl.q}</p>`;
-
-            lvl.fields.forEach(f => {
-                const key = `L${n}_${f.name.replace(/\s+/g, '_')}`;
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-2xl shadow-sm border";
-                card.innerHTML = `<label class="block text-[10px] font-black text-slate-400 uppercase mb-2">${f.name}</label>`;
-                
-                const val = p.data[key] || (f.isArray ? [''] : '');
-                
-                if (f.isArray) {
-                    const wrap = document.createElement('div');
-                    wrap.className = "space-y-2";
-                    val.forEach((v, i) => {
-                        const row = document.createElement('div');
-                        row.className = "flex gap-2";
-                        row.innerHTML = `<input type="text" value="${v}" class="flex-1 p-2 bg-slate-50 border rounded-lg text-sm" oninput="app.updateData('${key}', ${i}, this.value)">`;
-                        wrap.appendChild(row);
-                    });
-                    const add = document.createElement('button');
-                    add.className = "mt-2 text-[9px] font-bold text-blue-500 uppercase";
-                    add.innerText = "+ Добавить";
-                    add.onclick = () => { p.data[key] = [...val, '']; app.loadLevel(n); };
-                    card.appendChild(wrap); card.appendChild(add);
-                } else {
-                    const tx = document.createElement('textarea');
-                    tx.className = "w-full p-3 bg-slate-50 border rounded-xl text-sm min-h-[80px] outline-none";
-                    tx.value = val;
-                    tx.oninput = (e) => p.data[key] = e.target.value;
-                    card.appendChild(tx);
-                }
-                container.appendChild(card);
-            });
-        },
-
-        updateData(key, idx, val) {
-            const p = this.state.projects.find(x => x.id === this.state.activeId);
-            p.data[key][idx] = val;
-        },
-
-        saveData() {
-            localStorage.setItem(`p_${this.state.user}`, JSON.stringify(this.state.projects));
-            alert("Данные сохранены локально");
-        },
-
-        // MODAL HELPERS
-        toggleModal(show) {
-            document.getElementById('tpl-modal').classList.toggle('active', show);
-            if (show) this.renderTplSidebar();
-        },
-
-        renderTplSidebar() {
-            const el = document.getElementById('tpl-sidebar');
-            el.innerHTML = this.state.templates.map(t => `
-                <div onclick="app.editTemplate('${t.id}')" class="p-4 mb-2 bg-white border-2 rounded-2xl cursor-pointer text-[10px] font-bold uppercase transition ${this.state.editTplId === t.id ? 'border-blue-500 bg-blue-50' : 'border-transparent'}">
-                    ${t.title}
-                </div>
-            `).join('') + `<button onclick="app.resetTplForm()" class="w-full text-blue-500 text-[10px] font-black mt-4 uppercase">+ Новый шаблон</button>`;
-        },
-
-        editTemplate(id) {
-            this.state.editTplId = id;
-            const t = this.state.templates.find(x => x.id === id);
-            document.getElementById('f-tpl-title').value = t.title;
-            document.getElementById('f-tpl-file').value = t.file;
-            document.getElementById('f-tpl-content').value = t.content;
-            document.getElementById('btn-del-tpl').classList.remove('hidden');
-            this.renderTplSidebar();
-        },
-
-        resetTplForm() {
-            this.state.editTplId = null;
-            document.getElementById('f-tpl-title').value = '';
-            document.getElementById('f-tpl-file').value = '';
-            document.getElementById('f-tpl-content').value = '';
-            document.getElementById('btn-del-tpl').classList.add('hidden');
-            this.renderTplSidebar();
-        },
-
-        exportJSON() {
-            const p = this.state.projects.find(x => x.id === this.state.activeId);
-            if (!p) return;
-            const blob = new Blob([JSON.stringify(p, null, 2)], {type: 'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-            a.download = `SA_Project_${p.name}.json`; a.click();
-        }
+    // 2. ГЛОБАЛЬНОЕ СОСТОЯНИЕ
+    window.state = {
+        user: localStorage.getItem('hub_user') || null,
+        activeId: localStorage.getItem('hub_active_id') || null,
+        activeLvl: 1,
+        editTplId: null,
+        projects: [],
+        templates: []
     };
 
-    // ЗАПУСК ПРИ ЗАГРУЗКЕ
-    window.onload = () => app.init();
+    // 3. ФУНКЦИИ ВХОДА И ЗАГРУЗКИ
+    window.handleLogin = function() {
+        const name = document.getElementById('user-input').value;
+        if(!name) return;
+        localStorage.setItem('hub_user', name);
+        window.location.reload();
+    };
+
+    window.init = function() {
+        if(!window.state.user) return;
+        document.getElementById('auth').style.display = 'none';
+        document.getElementById('sidebar').classList.remove('hidden');
+        document.getElementById('main').classList.remove('hidden');
+        document.getElementById('user-tag').innerText = window.state.user;
+
+        window.state.projects = JSON.parse(localStorage.getItem('p_' + window.state.user)) || [];
+        window.state.templates = JSON.parse(localStorage.getItem('t_' + window.state.user)) || [
+            {id: 't1', title: 'Standard Spec', file: 'spec.njk', body: '# {{name}}'}
+        ];
+
+        renderSidebar();
+        renderTabs();
+        if(window.state.activeId) selectProject(window.state.activeId);
+    };
+
+    // 4. ПРОЕКТЫ (Прямое управление через Reload)
+    window.addProject = function() {
+        const name = prompt("Название проекта:");
+        if(!name) return;
+        const newP = { id: 'p' + Date.now(), name: name, data: {} };
+        const current = JSON.parse(localStorage.getItem('p_' + window.state.user)) || [];
+        current.push(newP);
+        localStorage.setItem('p_' + window.state.user, JSON.stringify(current));
+        localStorage.setItem('hub_active_id', newP.id);
+        window.location.reload();
+    };
+
+    window.deleteProject = function(id) {
+        if(!confirm("Удалить проект?")) return;
+        let current = JSON.parse(localStorage.getItem('p_' + window.state.user)) || [];
+        current = current.filter(x => x.id !== id);
+        localStorage.setItem('p_' + window.state.user, JSON.stringify(current));
+        if(localStorage.getItem('hub_active_id') === id) localStorage.removeItem('hub_active_id');
+        window.location.reload();
+    };
+
+    window.selectProject = function(id) {
+        window.state.activeId = id;
+        localStorage.setItem('hub_active_id', id);
+        const p = window.state.projects.find(x => x.id === id);
+        if(!p) return;
+        document.getElementById('active-p-name').innerText = p.name;
+        renderSidebar();
+        loadLevel(window.state.activeLvl);
+    };
+
+    // 5. ШАБЛОНЫ (Прямое управление через Reload)
+    window.saveTemplate = function() {
+        const t = document.getElementById('tpl-in-title').value;
+        const f = document.getElementById('tpl-in-file').value;
+        const b = document.getElementById('tpl-in-body').value;
+        if(!t || !f) return alert("Заполните поля");
+
+        let list = JSON.parse(localStorage.getItem('t_' + window.state.user)) || [];
+        if(window.state.editTplId) {
+            const idx = list.findIndex(x => x.id === window.state.editTplId);
+            list[idx] = { id: window.state.editTplId, title: t, file: f, body: b };
+        } else {
+            list.push({ id: 't' + Date.now(), title: t, file: f, body: b });
+        }
+        localStorage.setItem('t_' + window.state.user, JSON.stringify(list));
+        window.location.reload();
+    };
+
+    window.deleteTemplate = function() {
+        if(!window.state.editTplId || !confirm("Удалить этот шаблон?")) return;
+        let list = JSON.parse(localStorage.getItem('t_' + window.state.user)) || [];
+        list = list.filter(x => x.id !== window.state.editTplId);
+        localStorage.setItem('t_' + window.state.user, JSON.stringify(list));
+        window.location.reload();
+    };
+
+    // 6. UI РЕНДЕРИНГ
+    function renderSidebar() {
+        const el = document.getElementById('proj-list');
+        el.innerHTML = window.state.projects.map(p => `
+            <div onclick="selectProject('${p.id}')" class="p-3 rounded-xl cursor-pointer text-[10px] font-bold uppercase flex justify-between items-center transition ${window.state.activeId === p.id ? 'active-proj shadow-lg' : 'hover:bg-slate-700'}">
+                <span class="truncate pr-2">📄 ${p.name}</span>
+                <button onclick="event.stopPropagation(); deleteProject('${p.id}')" class="text-red-400 hover:text-white font-black text-lg">×</button>
+            </div>
+        `).join('');
+    }
+
+    function renderTabs() {
+        const el = document.getElementById('tab-bar');
+        el.innerHTML = LEVELS.map(l => `
+            <button onclick="loadLevel(${l.n})" class="px-6 py-4 text-[10px] font-black uppercase l-tab-${l.n} ${window.state.activeLvl === l.n ? 'active-tab' : ''}">L${l.n}</button>
+        `).join('');
+    }
+
+    window.loadLevel = function(n) {
+        window.state.activeLvl = n;
+        document.querySelectorAll('[class*="l-tab-"]').forEach(b => b.classList.remove('active-tab'));
+        const activeB = document.querySelector('.l-tab-' + n);
+        if(activeB) activeB.classList.add('active-tab');
+
+        const lvl = LEVELS.find(x => x.n === n);
+        const p = window.state.projects.find(x => x.id === window.state.activeId);
+        const ed = document.getElementById('editor');
+        ed.innerHTML = `<h3 class="text-2xl font-black text-slate-800 mb-1">${lvl.title}</h3><p class="text-orange-600 italic mb-8">${lvl.q}</p>`;
+
+        lvl.fields.forEach(f => {
+            const key = `L${n}_${f.id}`;
+            const card = document.createElement('div');
+            card.className = "bg-white p-6 rounded-2xl border mb-4 shadow-sm";
+            card.innerHTML = `<label class="block text-[10px] font-black text-slate-400 uppercase mb-3">${f.name}</label>`;
+
+            const val = p.data[key] || (f.isArray ? [''] : '');
+
+            if(f.isArray) {
+                const wrap = document.createElement('div');
+                val.forEach((item, i) => {
+                    const row = document.createElement('div');
+                    row.className = "flex gap-2 mb-2";
+                    row.innerHTML = `<input type="text" value="${item}" class="flex-1 p-2 bg-slate-50 border rounded-lg text-sm" oninput="updateVal('${key}', ${i}, this.value)">
+                                     <button onclick="removeArrItem('${key}', ${i})" class="text-red-300 hover:text-red-500 font-bold px-2">×</button>`;
+                    wrap.appendChild(row);
+                });
+                const add = document.createElement('button');
+                add.className = "text-[9px] font-bold text-blue-500 uppercase mt-2";
+                add.innerText = "+ Добавить";
+                add.onclick = () => { p.data[key] = [...val, '']; loadLevel(n); };
+                card.appendChild(wrap); card.appendChild(add);
+            } else {
+                const tx = document.createElement('textarea');
+                tx.className = "w-full p-4 bg-slate-50 border rounded-xl text-sm min-h-[100px] outline-none";
+                tx.value = val;
+                tx.oninput = (e) => p.data[key] = e.target.value;
+                card.appendChild(tx);
+            }
+            ed.appendChild(card);
+        });
+    };
+
+    window.updateVal = function(key, i, v) {
+        const p = window.state.projects.find(x => x.id === window.state.activeId);
+        p.data[key][i] = v;
+    };
+
+    window.removeArrItem = function(key, i) {
+        const p = window.state.projects.find(x => x.id === window.state.activeId);
+        p.data[key].splice(i, 1);
+        loadLevel(window.state.activeLvl);
+    };
+
+    window.saveProjectData = function() {
+        localStorage.setItem('p_' + window.state.user, JSON.stringify(window.state.projects));
+        alert("Сохранено!");
+    };
+
+    // 7. МОДАЛКА
+    window.toggleTplModal = function(show) {
+        document.getElementById('tpl-modal').classList.toggle('open', show);
+        if(show) renderTplSide();
+    };
+
+    function renderTplSide() {
+        const el = document.getElementById('tpl-list-side');
+        el.innerHTML = window.state.templates.map(t => `
+            <div onclick="editTpl('${t.id}')" class="p-4 mb-2 bg-white border-2 rounded-xl cursor-pointer text-[10px] font-black uppercase transition ${window.state.editTplId === t.id ? 'border-blue-500' : 'border-transparent'}">
+                ${t.title}
+            </div>
+        `).join('') + `<button onclick="resetTplForm()" class="w-full text-blue-500 font-bold text-[10px] mt-4 uppercase">+ Новый шаблон</button>`;
+    }
+
+    window.editTpl = function(id) {
+        window.state.editTplId = id;
+        const t = window.state.templates.find(x => x.id === id);
+        document.getElementById('tpl-in-title').value = t.title;
+        document.getElementById('tpl-in-file').value = t.file;
+        document.getElementById('tpl-in-body').value = t.body;
+        document.getElementById('tpl-del-btn').classList.remove('hidden');
+        renderTplSide();
+    };
+
+    window.resetTplForm = function() {
+        window.state.editTplId = null;
+        document.getElementById('tpl-in-title').value = '';
+        document.getElementById('tpl-in-file').value = '';
+        document.getElementById('tpl-in-body').value = '';
+        document.getElementById('tpl-del-btn').classList.add('hidden');
+        renderTplSide();
+    };
+
+    window.exportJSON = function() {
+        const p = window.state.projects.find(x => x.id === window.state.activeId);
+        if(!p) return;
+        const blob = new Blob([JSON.stringify(p, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `Project_${p.name}.json`; a.click();
+    };
+
+    window.onload = init;
 </script>
 </body>
 </html>
