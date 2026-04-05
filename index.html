@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>SA Master Hub | Senior Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .level-tab.active { border-bottom: 4px solid #3b82f6; color: #3b82f6; font-weight: bold; background: #eff6ff; }
+        .sidebar-item.active { background: #334155; border-left: 4px solid #3b82f6; color: white; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-100 flex h-screen overflow-hidden font-sans">
+
+    <div id="auth-screen" class="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center">
+        <div class="bg-white p-10 rounded-2xl shadow-2xl w-[400px] text-center">
+            <div class="mb-6">
+                <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">SA</div>
+                <h2 class="text-2xl font-bold text-slate-800">Личный кабинет</h2>
+                <p class="text-slate-500 text-sm">Системный анализ: Level 1-10</p>
+            </div>
+            <input type="text" id="username" placeholder="Имя пользователя" class="w-full mb-4 p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="password" id="password" placeholder="Пароль" class="w-full mb-6 p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Войти в Hub</button>
+            <p class="mt-4 text-xs text-slate-400">Данные хранятся локально в вашем браузере</p>
+        </div>
+    </div>
+
+    <aside class="w-72 bg-slate-800 text-slate-300 flex flex-col hidden shadow-xl" id="main-sidebar">
+        <div class="p-6 border-b border-slate-700">
+            <h1 class="text-xl font-bold text-white tracking-tight">SA Operating Hub</h1>
+            <div class="flex items-center mt-2 text-xs text-blue-400">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                <span id="user-display"></span>
+            </div>
+        </div>
+        
+        <div class="p-4 flex-1 overflow-y-auto">
+            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-2">Мои Проекты</h3>
+            <nav id="project-list" class="space-y-1">
+                </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-700 space-y-2">
+            <button onclick="createNewProject()" class="w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-lg text-sm font-medium transition flex items-center justify-center">
+                <span class="mr-2 text-lg">+</span> Создать задачу
+            </button>
+            <button onclick="logout()" class="w-full text-xs text-slate-500 hover:text-red-400 p-2 transition">Выйти из системы</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col hidden bg-slate-50" id="main-content">
+        <header class="bg-white border-b p-4 flex justify-between items-center px-8">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800" id="active-project-name">Выберите или создайте проект</h2>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="downloadJSON()" class="text-sm font-medium border border-slate-300 text-slate-600 px-5 py-2 rounded-lg hover:bg-slate-50 transition">Скачать JSON</button>
+                <button onclick="saveCurrentData()" class="text-sm font-medium bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-200 transition">Сохранить прогресс</button>
+            </div>
+        </header>
+
+        <div class="flex bg-white border-b overflow-x-auto no-scrollbar scroll-smooth shadow-sm" id="tabs-bar">
+            </div>
+
+        <section class="flex-1 overflow-y-auto p-10">
+            <div id="level-header" class="max-w-4xl mb-10">
+                <div id="lvl-tag" class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold mb-3 uppercase tracking-widest">Level 1</div>
+                <h3 class="text-3xl font-extrabold text-slate-900 mb-2" id="lvl-title">Business Strategy</h3>
+                <p class="text-lg text-slate-500 italic" id="lvl-q">Зачем мы это делаем?</p>
+            </div>
+
+            <div id="fields-grid" class="grid grid-cols-1 gap-8 max-w-4xl">
+                </div>
+
+            <div id="senior-checklist" class="max-w-4xl mt-12 p-6 bg-amber-50 border-l-4 border-amber-400 rounded-r-xl">
+                <h4 class="font-bold text-amber-900 flex items-center mb-3">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Senior Checklist (Контроль Качества)
+                </h4>
+                <ul id="checklist-items" class="text-sm text-amber-800 space-y-2 list-disc ml-5">
+                    </ul>
+            </div>
+        </section>
+    </main>
+
+<script>
+    // Константы уровней на основе твоей карты (operating map)
+    const LEVELS = [
+        { n: 1, title: "Business Strategy", q: "Зачем мы это делаем?", fields: ["Business Vision", "KPIs / Metrics", "Decision Rules", "Success Criteria"], checklist: ["У каждой цели есть KPI", "Определены trade-offs", "Нет конфликтующих целей"] },
+        { n: 2, title: "Business Requirements", q: "Что нужно бизнесу?", fields: ["Stakeholders", "Scope (In/Out)", "Business Rules", "Assumptions / Dependencies"], checklist: ["Каждое требование связано с L1", "Scope зафиксирован", "Нет непроверяемых требований"] },
+        { n: 3, title: "Business Processes", q: "Как работает бизнес?", fields: ["BPMN Path (Screenshots)", "Happy Path", "Alternative & Error Flows", "System Boundaries"], checklist: ["Покрыты исключения", "Четко определено, что делает система", "Найдены узкие места"] },
+        { n: 4, title: "Product Requirements", q: "Что в бэклоге?", fields: ["Epics & User Stories", "Acceptance Criteria", "Backlog Priorities"], checklist: ["Stories понятны разработке", "Acceptance Criteria покрывают edge cases", "Нет 'технических' стори без ценности"] },
+        { n: 5, title: "System Interaction", q: "Кто с кем говорит?", fields: ["Actors & External Systems", "C4 Context Diagram Path", "Interaction Patterns (Sync/Async)"], checklist: ["Все внешние системы учтены", "Определен тип обмена (Request-Response / Event)"] },
+        { n: 6, title: "System Behavior", q: "Динамика системы?", fields: ["Sequence Diagram Path", "State Machine (Lifecycles)", "Error flows / Retries"], checklist: ["Учтены таймауты и задержки", "Обработка ошибок прописана", "Нет race conditions"] },
+        { n: 7, title: "System Structure", q: "Модель данных?", fields: ["ER Diagram Path", "Domain Model (Conceptual)", "Entity States"], checklist: ["Единый источник истины для данных", "Нет 'Божественных' сущностей", "Версионирование предусмотрено"] },
+        { n: 8, title: "System Architecture", q: "Архитектура?", fields: ["C4 L2/L3 Path", "Data Ownership Map", "ADR (Architecture Decisions)"], checklist: ["Сервисы имеют четкие границы", "Отказоустойчивость заложена (Circuit Breakers)", "Нет Shared Database"] },
+        { n: 9, title: "Infrastructure", q: "Где крутится?", fields: ["Deployment Diagram Path", "CI/CD Pipeline", "Observability (Logs/Metrics)"], checklist: ["Разделены окружения (Dev/Test/Prod)", "Есть план Disaster Recovery", "Секреты не в коде"] },
+        { n: 10, title: "Implementation", q: "Код и контракты?", fields: ["OpenAPI / Swagger Path", "DB Physical Schema", "Migration Strategy"], checklist: ["Реализация = Модель (L7)", "Обратная совместимость API", "Есть коды ошибок"] }
+    ];
+
+    let currentUser = null;
+    let projects = [];
+    let activeProjectId = null;
+    let currentLvl = 1;
+
+    // АВТОРИЗАЦИЯ
+    function login() {
+        const user = document.getElementById('username').value;
+        if(user) {
+            currentUser = user;
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-sidebar').classList.remove('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('user-display').innerText = user;
+            loadFromStorage();
+            renderProjectList();
+            if(projects.length > 0) selectProject(projects[0].id);
+        }
+    }
+
+    function logout() { location.reload(); }
+
+    // УПРАВЛЕНИЕ ПРОЕКТАМИ
+    function createNewProject() {
+        const name = prompt("Назовите задачу/проект:");
+        if(name) {
+            const newProj = { id: Date.now(), name: name, data: {} };
+            projects.push(newProj);
+            saveToStorage();
+            selectProject(newProj.id);
+        }
+    }
+
+    function selectProject(id) {
+        activeProjectId = id;
+        const proj = projects.find(p => p.id === id);
+        document.getElementById('active-project-name').innerText = proj.name;
+        renderProjectList();
+        renderTabs();
+        loadLevel(1);
+    }
+
+    // РЕНДЕРИНГ
+    function renderProjectList() {
+        const container = document.getElementById('project-list');
+        container.innerHTML = projects.map(p => `
+            <div onclick="selectProject(${p.id})" class="sidebar-item p-3 rounded-lg cursor-pointer transition flex items-center ${activeProjectId === p.id ? 'active' : 'hover:bg-slate-700/50'}">
+                <span class="mr-3 text-slate-500">📄</span>
+                <span class="text-sm truncate">${p.name}</span>
+            </div>
+        `).join('');
+    }
+
+    function renderTabs() {
+        const bar = document.getElementById('tabs-bar');
+        bar.innerHTML = LEVELS.map(l => `
+            <button onclick="loadLevel(${l.n})" class="level-tab px-6 py-4 text-xs font-bold whitespace-nowrap border-b-4 border-transparent transition tab-btn-${l.n}">
+                LEVEL ${l.n}
+            </button>
+        `).join('');
+    }
+
+    function loadLevel(n) {
+        currentLvl = n;
+        document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+        const activeBtn = document.querySelector(`.tab-btn-${n}`);
+        if(activeBtn) activeBtn.classList.add('active');
+        
+        const lvl = LEVELS.find(l => l.n === n);
+        document.getElementById('lvl-tag').innerText = `Level ${n}`;
+        document.getElementById('lvl-title').innerText = lvl.title;
+        document.getElementById('lvl-q').innerText = lvl.q;
+
+        // Чек-лист
+        document.getElementById('checklist-items').innerHTML = lvl.checklist.map(i => `<li>${i}</li>`).join('');
+
+        // Поля
+        const grid = document.getElementById('fields-grid');
+        grid.innerHTML = '';
+        const proj = projects.find(p => p.id === activeProjectId);
+        
+        lvl.fields.forEach(f => {
+            const key = `L${n}_${f}`;
+            const val = proj.data[key] || '';
+            grid.innerHTML += `
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <label class="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">${f}</label>
+                    <textarea oninput="updateField('${key}', this.value)" 
+                        placeholder="Введите детали или путь к файлу..."
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-h-[120px] text-slate-700 text-sm leading-relaxed">${val}</textarea>
+                </div>
+            `;
+        });
+    }
+
+    function updateField(key, val) {
+        const proj = projects.find(p => p.id === activeProjectId);
+        if(proj) proj.data[key] = val;
+    }
+
+    // ХРАНЕНИЕ И ЭКСПОРТ
+    function saveToStorage() {
+        localStorage.setItem(`sa_hub_v2_${currentUser}`, JSON.stringify(projects));
+    }
+
+    function loadFromStorage() {
+        const saved = localStorage.getItem(`sa_hub_v2_${currentUser}`);
+        projects = saved ? JSON.parse(saved) : [];
+    }
+
+    function saveCurrentData() {
+        saveToStorage();
+        alert("Прогресс сохранен в памяти браузера!");
+    }
+
+    function downloadJSON() {
+        const proj = projects.find(p => p.id === activeProjectId);
+        if(!proj) return;
+        const blob = new Blob([JSON.stringify(proj, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `SA_Project_${proj.name.replace(/\s+/g, '_')}.json`;
+        a.click();
+    }
+</script>
+</body>
+</html>
