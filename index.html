@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SA Master Hub v5 | CRUD Edition</title>
+    <title>SA Master Hub v6 | Full Methodology CRUD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .level-tab.active { border-bottom: 4px solid #3b82f6; color: #3b82f6; font-weight: bold; background: #eff6ff; }
@@ -13,79 +13,81 @@
         .modal.active { display: flex; }
     </style>
 </head>
-<body class="bg-slate-100 flex h-screen overflow-hidden font-sans">
+<body class="bg-slate-100 flex h-screen overflow-hidden font-sans text-slate-900">
 
     <div id="auth-screen" class="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center">
         <div class="bg-white p-10 rounded-2xl shadow-2xl w-[400px] text-center">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6">SA Hub v5</h2>
-            <input type="text" id="username" placeholder="Имя пользователя" class="w-full mb-4 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Войти</button>
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">SA Hub v6</h2>
+            <input type="text" id="username" placeholder="Имя аналитика" class="w-full mb-4 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Войти в систему</button>
         </div>
     </div>
 
     <aside class="w-80 bg-slate-800 text-slate-300 flex flex-col hidden shadow-xl" id="main-sidebar">
         <div class="p-6 border-b border-slate-700">
-            <h1 class="text-xl font-bold text-white tracking-tight">SA Operating Hub</h1>
-            <div id="user-display" class="text-xs text-blue-400 mt-1"></div>
+            <h1 class="text-xl font-bold text-white tracking-tight italic">System Analyst Map</h1>
+            <div id="user-display" class="text-xs text-blue-400 mt-1 uppercase tracking-widest"></div>
         </div>
         
         <div class="p-4 flex-1 overflow-y-auto border-b border-slate-700">
             <div class="flex justify-between items-center mb-4 px-2">
-                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Проекты</h3>
-                <button onclick="createNewProject()" class="text-blue-400 hover:text-white text-xl font-bold">+</button>
+                <h3 class="text-xs font-semibold text-slate-500 uppercase">Проекты (Задачи)</h3>
+                <button onclick="createNewProject()" class="text-blue-400 hover:text-white text-xl">+</button>
             </div>
             <nav id="project-list" class="space-y-1"></nav>
         </div>
 
-        <div class="p-4 h-80 overflow-y-auto bg-slate-900/50">
+        <div class="p-4 h-64 overflow-y-auto bg-slate-900/40">
             <div class="flex justify-between items-center mb-4 px-2">
-                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Библиотека NJK</h3>
-                <button onclick="openTemplateModal()" class="text-blue-400 hover:text-white text-xs">Управление</button>
+                <h3 class="text-xs font-semibold text-slate-500 uppercase">Библиотека NJK</h3>
+                <button onclick="openTemplateModal()" class="text-blue-400 hover:text-white text-xs underline">Управление</button>
             </div>
-            <div id="template-list" class="space-y-3 text-sm"></div>
+            <div id="template-list" class="space-y-2 text-sm"></div>
         </div>
 
         <div class="p-4 border-t border-slate-700">
-            <button onclick="logout()" class="w-full text-xs text-slate-500 hover:text-red-400 p-2 transition">Выйти</button>
+            <button onclick="logout()" class="w-full text-xs text-slate-500 hover:text-red-400 transition">Завершить сессию</button>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col hidden bg-slate-50" id="main-content">
+    <main class="flex-1 flex flex-col hidden" id="main-content">
         <header class="bg-white border-b p-4 flex justify-between items-center px-8 shadow-sm">
-            <h2 class="text-lg font-bold text-slate-800" id="active-project-name">Выберите проект</h2>
+            <h2 class="text-lg font-bold" id="active-project-name">...</h2>
             <div class="flex gap-3">
-                <button onclick="downloadJSON()" class="text-sm font-medium border border-slate-300 px-5 py-2 rounded-lg hover:bg-slate-50">JSON</button>
-                <button onclick="saveAll()" class="text-sm font-medium bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-200">Сохранить</button>
+                <button onclick="downloadJSON()" class="text-xs font-bold border border-slate-300 px-4 py-2 rounded hover:bg-slate-50">EXPORT JSON</button>
+                <button onclick="saveAll(true)" class="text-xs font-bold bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 shadow-md">SAVE DATA</button>
             </div>
         </header>
 
-        <div class="flex bg-white border-b overflow-x-auto" id="tabs-bar"></div>
+        <div class="flex bg-white border-b overflow-x-auto no-scrollbar" id="tabs-bar"></div>
 
-        <section class="flex-1 overflow-y-auto p-10">
-            <div id="level-header" class="max-w-4xl mb-10">
-                <div id="lvl-tag" class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold mb-3 uppercase tracking-widest"></div>
-                <h3 class="text-3xl font-extrabold text-slate-900 mb-2" id="lvl-title"></h3>
-                <p class="text-lg text-slate-500 italic" id="lvl-q"></p>
+        <section class="flex-1 overflow-y-auto p-10 bg-slate-50">
+            <div id="level-header" class="max-w-4xl mb-8">
+                <div id="lvl-tag" class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black mb-3 uppercase tracking-widest"></div>
+                <h3 class="text-2xl font-black text-slate-900 mb-2" id="lvl-title"></h3>
+                <p class="text-md text-orange-600 font-medium italic border-l-4 border-orange-400 pl-4" id="lvl-q"></p>
             </div>
-            <div id="fields-grid" class="grid grid-cols-1 gap-8 max-w-4xl"></div>
+            <div id="fields-grid" class="grid grid-cols-1 gap-6 max-w-4xl pb-20"></div>
         </section>
     </main>
 
     <div id="template-modal" class="modal">
-        <div class="bg-white w-[800px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-            <div class="p-6 border-b flex justify-between items-center">
-                <h3 class="text-xl font-bold">Управление шаблонами NJK</h3>
-                <button onclick="closeTemplateModal()" class="text-2xl text-slate-400">&times;</button>
+        <div class="bg-white w-[900px] h-[80vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="p-5 border-b flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-700 underline">Library Manager</h3>
+                <button onclick="closeTemplateModal()" class="text-xl">&times;</button>
             </div>
             <div class="flex-1 flex overflow-hidden">
-                <div class="w-1/3 border-r bg-slate-50 p-4 overflow-y-auto" id="modal-tpl-list"></div>
-                <div class="w-2/3 p-6 flex flex-col space-y-4">
-                    <input type="text" id="tpl-title" placeholder="Название шаблона" class="p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                    <input type="text" id="tpl-filename" placeholder="filename.njk" class="p-3 border rounded-lg text-sm font-mono">
-                    <textarea id="tpl-content" placeholder="Nunjucks code here..." class="flex-1 p-4 border rounded-lg font-mono text-xs bg-slate-900 text-green-400 outline-none"></textarea>
-                    <div class="flex justify-between">
-                        <button onclick="deleteTemplate()" id="btn-tpl-delete" class="px-4 py-2 text-red-500 hover:bg-red-50 rounded hidden">Удалить</button>
-                        <button onclick="saveTemplate()" class="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">Сохранить шаблон</button>
+                <div class="w-64 border-r p-4 bg-slate-50 overflow-y-auto" id="modal-tpl-list"></div>
+                <div class="flex-1 p-6 flex flex-col space-y-3">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="tpl-title" placeholder="Название (например: Jira Task)" class="p-2 border rounded text-sm">
+                        <input type="text" id="tpl-filename" placeholder="filename.njk" class="p-2 border rounded text-sm font-mono">
+                    </div>
+                    <textarea id="tpl-content" placeholder="Код шаблона..." class="flex-1 p-4 border rounded font-mono text-xs bg-slate-800 text-green-400"></textarea>
+                    <div class="flex justify-between pt-2">
+                        <button onclick="deleteTemplate()" id="btn-tpl-delete" class="text-red-500 text-xs font-bold hidden uppercase">Удалить шаблон</button>
+                        <button onclick="saveTemplate()" class="bg-blue-600 text-white px-6 py-2 rounded text-xs font-bold uppercase">Сохранить в библиотеку</button>
                     </div>
                 </div>
             </div>
@@ -93,18 +95,122 @@
     </div>
 
 <script>
-    // --- Конфигурация уровней (L1-L10) ---
+    // --- ПОЛНАЯ КОНФИГУРАЦИЯ ИЗ ВАШЕГО ФАЙЛА ---
     const LEVELS = [
-        { n: 1, title: "Business Strategy", q: "Зачем мы это делаем?", fields: [{name: "Business Vision"}, {name: "KPIs", isArray: true}, {name: "Decision Rules", isArray: true}] },
-        { n: 2, title: "Business Requirements", q: "Что нужно бизнесу?", fields: [{name: "Stakeholders", isArray: true}, {name: "Scope In", isArray: true}, {name: "Business Rules", isArray: true}] },
-        { n: 3, title: "Business Processes", q: "Как работает бизнес?", fields: [{name: "BPMN Path", isArray: true}, {name: "Happy Path"}, {name: "Alternative Flows", isArray: true}] },
-        { n: 4, title: "Product Requirements", q: "Что в бэклоге?", fields: [{name: "Epics & User Stories", isArray: true}, {name: "Acceptance Criteria", isArray: true}] },
-        { n: 5, title: "System Interaction", q: "Кто с кем говорит?", fields: [{name: "Actors", isArray: true}, {name: "Context Diagram Path", isArray: true}] },
-        { n: 6, title: "System Behavior", q: "Динамика?", fields: [{name: "Sequence Path", isArray: true}, {name: "Error flows", isArray: true}] },
-        { n: 7, title: "System Structure", q: "Модель данных?", fields: [{name: "ER Diagram Path", isArray: true}, {name: "Domain Model"}] },
-        { n: 8, title: "System Architecture", q: "Архитектура?", fields: [{name: "Container Diagram Path", isArray: true}, {name: "Data Ownership", isArray: true}] },
-        { n: 9, title: "Infrastructure", q: "Где крутится?", fields: [{name: "Deployment Path", isArray: true}, {name: "CI/CD Pipeline"}] },
-        { n: 10, title: "Implementation", q: "Код?", fields: [{name: "OpenAPI Path", isArray: true}, {name: "DB Schema"}] }
+        { 
+            n: 1, 
+            title: "BUSINESS STRATEGY", 
+            q: "Зачем мы это делаем и как принимаем решения при конфликте целей?", 
+            fields: [
+                {name: "Business Vision"}, {name: "Business Goals"}, {name: "Business Objectives"},
+                {name: "KPIs / Success Metrics", isArray: true},
+                {name: "Business Constraints (бюджет, сроки, регуляторка)", isArray: true},
+                {name: "Priorities / Trade-offs (Speed / Cost / Quality)"},
+                {name: "Success Criteria (Definition of Success)"},
+                {name: "Decision Rules (Напр: Срок под угрозой -> режем scope)", isArray: true}
+            ]
+        },
+        { 
+            n: 2, 
+            title: "BUSINESS REQUIREMENTS", 
+            q: "Что конкретно нужно бизнесу для достижения целей?", 
+            fields: [
+                {name: "Stakeholders & Roles", isArray: true},
+                {name: "Scope (In / Out)", isArray: true},
+                {name: "Business Rules (Логика и ограничения)", isArray: true},
+                {name: "User Groups / Persona"},
+                {name: "High-level Needs"}
+            ]
+        },
+        { 
+            n: 3, 
+            title: "BUSINESS PROCESSES", 
+            q: "Как процесс выглядит сейчас (AS-IS) и как будет (TO-BE)?", 
+            fields: [
+                {name: "BPMN / Flowchart Links", isArray: true},
+                {name: "Happy Path Description"},
+                {name: "Alternative / Exception Flows", isArray: true},
+                {name: "Manual Steps / Automation Points"}
+            ]
+        },
+        { 
+            n: 4, 
+            title: "PRODUCT REQUIREMENTS", 
+            q: "Что именно мы должны разработать (функционал)?", 
+            fields: [
+                {name: "Epics & User Stories", isArray: true},
+                {name: "Functional Requirements", isArray: true},
+                {name: "Non-Functional Requirements (NFR)", isArray: true},
+                {name: "Acceptance Criteria (AC)", isArray: true},
+                {name: "UI/UX Mockup Links", isArray: true}
+            ]
+        },
+        { 
+            n: 5, 
+            title: "SYSTEM INTERACTION", 
+            q: "Кто с кем взаимодействует внутри и снаружи?", 
+            fields: [
+                {name: "System Actors", isArray: true},
+                {name: "Context Diagram / C4 Level 1"},
+                {name: "Integration Points (API / Events / Files)", isArray: true},
+                {name: "Data Flow Overview"}
+            ]
+        },
+        { 
+            n: 6, 
+            title: "SYSTEM BEHAVIOR", 
+            q: "Как система реагирует на события и запросы?", 
+            fields: [
+                {name: "Sequence Diagrams", isArray: true},
+                {name: "State Machine / Lifecycle Diagrams"},
+                {name: "Algorithm / Logic Details"},
+                {name: "Error Handling (Retry, Fallback)", isArray: true}
+            ]
+        },
+        { 
+            n: 7, 
+            title: "SYSTEM STRUCTURE", 
+            q: "Какова модель данных и внутренняя организация?", 
+            fields: [
+                {name: "ERD / Database Schema", isArray: true},
+                {name: "Domain Model Entities", isArray: true},
+                {name: "Data Dictionary / Types"},
+                {name: "Object Model / Classes"}
+            ]
+        },
+        { 
+            n: 8, 
+            title: "SYSTEM ARCHITECTURE", 
+            q: "На каких компонентах и технологиях строится решение?", 
+            fields: [
+                {name: "Component Diagram / C4 Level 2"},
+                {name: "Technology Stack"},
+                {name: "Data Ownership & Master Data"},
+                {name: "Security & Access Control"}
+            ]
+        },
+        { 
+            n: 9, 
+            title: "INFRASTRUCTURE", 
+            q: "Как и где решение разворачивается и живет?", 
+            fields: [
+                {name: "Deployment Diagram / C4 Level 3"},
+                {name: "Environments (Dev/Staging/Prod)"},
+                {name: "CI/CD Pipeline Details"},
+                {name: "Monitoring & Observability Strategy"}
+            ]
+        },
+        { 
+            n: 10, 
+            title: "IMPLEMENTATION", 
+            q: "Как это реализовано в коде и документации API?", 
+            fields: [
+                {name: "OpenAPI / Swagger Specs", isArray: true},
+                {name: "Database Scripts (Migrations)"},
+                {name: "ADR (Architecture Decision Records)", isArray: true},
+                {name: "Release Notes / Documentation"}
+            ]
+        }
     ];
 
     let currentUser = null;
@@ -113,48 +219,61 @@
     let activeProjectId = null;
     let currentTplId = null;
 
-    // --- AUTH & INIT ---
+    // --- CORE ---
     function login() {
-        const user = document.getElementById('username').value;
-        if(user) {
-            currentUser = user;
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('main-sidebar').classList.remove('hidden');
-            document.getElementById('main-content').classList.remove('hidden');
-            document.getElementById('user-display').innerText = `Аналитик: ${user}`;
-            loadAll();
-            renderProjectList();
-            renderTemplateList();
-            if(projects.length > 0) selectProject(projects[0].id);
-        }
+        const u = document.getElementById('username').value;
+        if(!u) return;
+        currentUser = u;
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('main-sidebar').classList.remove('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
+        document.getElementById('user-display').innerText = `ID: ${u}`;
+        initData();
     }
+
+    function initData() {
+        projects = JSON.parse(localStorage.getItem(`sa_hub_p_${currentUser}`)) || [];
+        templates = JSON.parse(localStorage.getItem(`sa_hub_t_${currentUser}`)) || [
+            { id: 'def1', title: 'System Analyst Spec (Full)', filename: 'full_spec.njk', content: '# SPEC: {{ name }}\n{% for l in metadata.levels_config %}\n## {{ l.title }}\n{% endfor %}' }
+        ];
+        renderProjectList();
+        renderTemplateList();
+        if(projects.length > 0) selectProject(projects[0].id);
+    }
+
+    function saveAll(silent = false) {
+        localStorage.setItem(`sa_hub_p_${currentUser}`, JSON.stringify(projects));
+        localStorage.setItem(`sa_hub_t_${currentUser}`, JSON.stringify(templates));
+        if(!silent) alert("Сохранено!");
+    }
+
     function logout() { location.reload(); }
 
-    // --- PROJECT CRUD ---
+    // --- PROJECTS CRUD ---
     function createNewProject() {
-        const name = prompt("Название задачи:");
-        if(name) {
-            const p = { id: `p_${Date.now()}`, name, data: {} };
-            projects.push(p);
-            saveAll();
-            renderProjectList();
-            selectProject(p.id);
-        }
+        const name = prompt("Введите название задачи/проекта:");
+        if(!name) return;
+        const p = { id: Date.now(), name, data: {} };
+        projects.push(p);
+        saveAll(true);
+        renderProjectList();
+        selectProject(p.id);
     }
 
-    function deleteProject(id, event) {
-        event.stopPropagation();
-        if(confirm("Удалить проект безвозвратно?")) {
+    function deleteProject(id, e) {
+        e.stopPropagation();
+        if(confirm("Удалить проект? Все данные будут потеряны.")) {
             projects = projects.filter(p => p.id !== id);
             if(activeProjectId === id) activeProjectId = null;
-            saveAll();
+            saveAll(true);
             renderProjectList();
+            if(projects.length > 0) selectProject(projects[0].id);
         }
     }
 
     function selectProject(id) {
         activeProjectId = id;
-        const p = projects.find(proj => proj.id === id);
+        const p = projects.find(x => x.id === id);
         document.getElementById('active-project-name').innerText = p.name;
         renderProjectList();
         renderTabs();
@@ -162,19 +281,19 @@
     }
 
     function renderProjectList() {
-        const list = document.getElementById('project-list');
-        list.innerHTML = projects.map(p => `
-            <div onclick="selectProject('${p.id}')" class="sidebar-item p-3 rounded-lg cursor-pointer flex justify-between items-center group ${activeProjectId === p.id ? 'active' : 'hover:bg-slate-700/50'}">
-                <span class="truncate text-sm pr-2">📄 ${p.name}</span>
-                <button onclick="deleteProject('${p.id}', event)" class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition">🗑️</button>
+        const container = document.getElementById('project-list');
+        container.innerHTML = projects.map(p => `
+            <div onclick="selectProject(${p.id})" class="sidebar-item p-3 rounded cursor-pointer flex justify-between items-center group ${activeProjectId === p.id ? 'active' : ''}">
+                <span class="truncate text-xs font-medium">📄 ${p.name}</span>
+                <button onclick="deleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400">🗑️</button>
             </div>
         `).join('');
     }
 
-    // --- TEMPLATE CRUD ---
-    function openTemplateModal() {
-        document.getElementById('template-modal').classList.add('active');
-        renderModalTplList();
+    // --- TEMPLATES CRUD ---
+    function openTemplateModal() { 
+        document.getElementById('template-modal').classList.add('active'); 
+        renderModalTplList(); 
         resetTplForm();
     }
     function closeTemplateModal() { document.getElementById('template-modal').classList.remove('active'); renderTemplateList(); }
@@ -191,22 +310,22 @@
         const title = document.getElementById('tpl-title').value;
         const filename = document.getElementById('tpl-filename').value;
         const content = document.getElementById('tpl-content').value;
-        if(!title || !filename) return alert("Заполните название и имя файла!");
+        if(!title || !filename) return alert("Заполните поля");
 
         if(currentTplId) {
-            const t = templates.find(tpl => tpl.id === currentTplId);
+            const t = templates.find(x => x.id === currentTplId);
             t.title = title; t.filename = filename; t.content = content;
         } else {
-            templates.push({ id: `t_${Date.now()}`, title, filename, content });
+            templates.push({ id: 't'+Date.now(), title, filename, content });
         }
-        saveAll();
+        saveAll(true);
         renderModalTplList();
         resetTplForm();
     }
 
     function editTemplate(id) {
         currentTplId = id;
-        const t = templates.find(tpl => tpl.id === id);
+        const t = templates.find(x => x.id === id);
         document.getElementById('tpl-title').value = t.title;
         document.getElementById('tpl-filename').value = t.filename;
         document.getElementById('tpl-content').value = t.content;
@@ -214,9 +333,9 @@
     }
 
     function deleteTemplate() {
-        if(confirm("Удалить этот шаблон?")) {
-            templates = templates.filter(t => t.id !== currentTplId);
-            saveAll();
+        if(confirm("Удалить шаблон?")) {
+            templates = templates.filter(x => x.id !== currentTplId);
+            saveAll(true);
             renderModalTplList();
             resetTplForm();
         }
@@ -224,24 +343,24 @@
 
     function renderModalTplList() {
         document.getElementById('modal-tpl-list').innerHTML = templates.map(t => `
-            <div onclick="editTemplate('${t.id}')" class="p-3 mb-2 rounded-lg bg-white border cursor-pointer hover:border-blue-500 transition">
-                <div class="font-bold text-xs">${t.title}</div>
-                <div class="text-[10px] text-slate-400 font-mono">${t.filename}</div>
+            <div onclick="editTemplate('${t.id}')" class="p-2 mb-2 bg-white border rounded cursor-pointer hover:border-blue-500 text-xs">
+                <div class="font-bold">${t.title}</div>
+                <div class="text-[10px] text-slate-400">${t.filename}</div>
             </div>
-        `).join('') + `<button onclick="resetTplForm()" class="w-full mt-4 text-xs text-blue-600 font-bold">+ Добавить новый</button>`;
+        `).join('') + `<button onclick="resetTplForm()" class="w-full mt-2 text-[10px] text-blue-600 font-bold">+ НОВЫЙ ШАБЛОН</button>`;
     }
 
     function renderTemplateList() {
         document.getElementById('template-list').innerHTML = templates.map(t => `
-            <div class="bg-slate-700/50 p-3 rounded-lg border border-slate-700">
-                <div class="font-semibold text-slate-100 mb-2">${t.title}</div>
-                <button onclick="downloadTplFile('${t.id}')" class="text-[10px] bg-slate-600 hover:bg-blue-600 text-white px-2 py-1 rounded transition">Скачать .njk</button>
+            <div class="bg-slate-700/30 p-2 rounded flex justify-between items-center">
+                <span class="text-[11px] truncate w-32">${t.title}</span>
+                <button onclick="downloadTplFile('${t.id}')" class="text-[9px] bg-slate-600 px-2 py-1 rounded hover:bg-blue-600 transition">NJK</button>
             </div>
         `).join('');
     }
 
     function downloadTplFile(id) {
-        const t = templates.find(tpl => tpl.id === id);
+        const t = templates.find(x => x.id === id);
         const blob = new Blob([t.content], {type: 'text/plain'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -249,85 +368,84 @@
         a.click();
     }
 
-    // --- EDITOR UI ---
+    // --- UI RENDERER ---
     function renderTabs() {
         document.getElementById('tabs-bar').innerHTML = LEVELS.map(l => `
-            <button onclick="loadLevel(${l.n})" class="level-tab px-6 py-4 text-xs font-bold border-b-4 border-transparent tab-btn-${l.n}">L${l.n}</button>
+            <button onclick="loadLevel(${l.n})" class="level-tab px-6 py-4 text-[10px] font-black border-b-4 border-transparent tab-btn-${l.n}">L${l.n}</button>
         `).join('');
     }
 
     function loadLevel(n) {
         document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
-        document.querySelector(`.tab-btn-${n}`).classList.add('active');
+        const btn = document.querySelector(`.tab-btn-${n}`);
+        if(btn) btn.classList.add('active');
+
         const lvl = LEVELS.find(l => l.n === n);
-        document.getElementById('lvl-tag').innerText = `Level ${n}`;
+        document.getElementById('lvl-tag').innerText = `Layer ${n} — ${lvl.title}`;
         document.getElementById('lvl-title').innerText = lvl.title;
         document.getElementById('lvl-q').innerText = lvl.q;
 
         const grid = document.getElementById('fields-grid');
         grid.innerHTML = '';
-        const proj = projects.find(p => p.id === activeProjectId);
+        const p = projects.find(x => x.id === activeProjectId);
+
         lvl.fields.forEach(f => {
             const key = `L${n}_${f.name}`;
-            grid.appendChild(createFieldEditor(key, f, proj.data[key]));
+            const fieldEl = createField(key, f, p.data[key]);
+            grid.appendChild(fieldEl);
         });
     }
 
-    function createFieldEditor(key, conf, value) {
-        const div = document.createElement('div');
-        div.className = "bg-white p-6 rounded-xl border shadow-sm";
-        div.dataset.key = key;
-        div.innerHTML = `<label class="block text-sm font-bold text-slate-700 mb-3 uppercase">${conf.name}</label>`;
+    function createField(key, conf, val) {
+        const card = document.createElement('div');
+        card.className = "bg-white p-5 rounded-xl border shadow-sm hover:shadow-md transition";
+        card.dataset.key = key;
+        card.innerHTML = `<label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-tighter">${conf.name}</label>`;
         
         if(!conf.isArray) {
-            div.innerHTML += `<textarea oninput="updateData('${key}', this.value)" class="w-full p-4 bg-slate-50 border rounded-lg min-h-[100px] text-sm outline-none">${value || ''}</textarea>`;
+            const area = document.createElement('textarea');
+            area.className = "w-full p-3 bg-slate-50 border border-slate-100 rounded text-sm outline-none focus:border-blue-300 min-h-[80px]";
+            area.value = val || '';
+            area.oninput = (e) => updateValue(key, e.target.value);
+            card.appendChild(area);
         } else {
-            div.innerHTML += `<div class="items-container space-y-2"></div><button onclick="addItem('${key}')" class="mt-3 text-xs text-blue-600 font-bold">+ Добавить</button>`;
-            const container = div.querySelector('.items-container');
-            (value || ['']).forEach(v => container.appendChild(createRow(key, v)));
+            const container = document.createElement('div');
+            container.className = "space-y-2 array-container";
+            (val || ['']).forEach(v => container.appendChild(createArrayRow(key, v)));
+            card.appendChild(container);
+
+            const addBtn = document.createElement('button');
+            addBtn.className = "mt-3 text-[10px] font-bold text-blue-500 hover:underline";
+            addBtn.innerText = "+ ДОБАВИТЬ ПУНКТ";
+            addBtn.onclick = () => { container.appendChild(createArrayRow(key, '')); };
+            card.appendChild(addBtn);
         }
-        return div;
+        return card;
     }
 
-    function createRow(key, val) {
+    function createArrayRow(key, val) {
         const row = document.createElement('div');
-        row.className = "flex gap-2 items-center";
+        row.className = "flex gap-2";
         row.innerHTML = `
-            <input type="text" value="${val}" oninput="updateArrayData('${key}')" class="flex-1 p-3 bg-slate-50 border rounded-lg text-sm outline-none">
-            <button onclick="this.parentElement.remove(); updateArrayData('${key}')" class="text-slate-300 hover:text-red-500">×</button>
+            <input type="text" value="${val}" class="flex-1 p-2 bg-slate-50 border border-slate-100 rounded text-sm outline-none" oninput="updateArray('${key}')">
+            <button onclick="this.parentElement.remove(); updateArray('${key}')" class="text-slate-300 hover:text-red-500">&times;</button>
         `;
         return row;
     }
 
-    function addItem(key) {
-        document.querySelector(`[data-key="${key}"] .items-container`).appendChild(createRow(key, ''));
-    }
-
-    function updateData(key, val) { projects.find(p => p.id === activeProjectId).data[key] = val; }
-    function updateArrayData(key) {
-        const vals = Array.from(document.querySelectorAll(`[data-key="${key}"] input`)).map(i => i.value);
-        projects.find(p => p.id === activeProjectId).data[key] = vals;
-    }
-
-    // --- STORAGE ---
-    function saveAll() {
-        localStorage.setItem(`sahub_v5_projs_${currentUser}`, JSON.stringify(projects));
-        localStorage.setItem(`sahub_v5_tpls_${currentUser}`, JSON.stringify(templates));
-    }
-    function loadAll() {
-        projects = JSON.parse(localStorage.getItem(`sahub_v5_projs_${currentUser}`)) || [];
-        templates = JSON.parse(localStorage.getItem(`sahub_v5_tpls_${currentUser}`)) || [
-            { id: 't1', title: 'Full Spec (Details)', filename: 'tz_full.njk', content: '# Project: {{ name }}\n{% for lvl in metadata.levels_config %}\n## L{{ lvl.n }} {{ lvl.title }}\n{% endfor %}' }
-        ];
+    function updateValue(key, v) { projects.find(p => p.id === activeProjectId).data[key] = v; }
+    function updateArray(key) {
+        const inputs = document.querySelectorAll(`[data-key="${key}"] input`);
+        projects.find(p => p.id === activeProjectId).data[key] = Array.from(inputs).map(i => i.value).filter(v => v.trim() !== '');
     }
 
     function downloadJSON() {
-        const p = projects.find(proj => proj.id === activeProjectId);
-        const out = { ...p, metadata: { date: new Date().toLocaleDateString(), levels_config: LEVELS } };
+        const p = projects.find(x => x.id === activeProjectId);
+        const out = { ...p, metadata: { levels_config: LEVELS, timestamp: new Date() } };
         const blob = new Blob([JSON.stringify(out, null, 2)], {type: 'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `SA_${p.name}.json`;
+        a.download = `SA_SPEC_${p.name}.json`;
         a.click();
     }
 </script>
