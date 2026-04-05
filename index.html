@@ -2,41 +2,39 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SA Master Hub v17 | Zero-Bug Edition</title>
+    <title>SA Master Hub v18 | Iron Stability</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .level-tab.active { border-bottom: 4px solid #3b82f6; color: #3b82f6; font-weight: bold; background: #eff6ff; }
         .sidebar-item.active { background: #334155; border-left: 4px solid #3b82f6; color: white; }
-        .sidebar-item .delete-proj-btn { opacity: 0.5; transition: opacity 0.2s; }
-        .sidebar-item:hover .delete-proj-btn { opacity: 1; }
         .artifact-card { border-left: 4px solid #10b981; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 1000; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
-        .help-text { font-size: 0.7rem; color: #64748b; margin-top: 0.3rem; line-height: 1.2; }
+        .help-text { font-size: 0.7rem; color: #64748b; margin-top: 0.2rem; font-style: italic; }
     </style>
 </head>
 <body class="bg-slate-100 flex h-screen overflow-hidden font-sans text-slate-900">
 
     <div id="auth-screen" class="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl w-[400px] text-center">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-widest">SA Hub v17</h2>
+            <h2 class="text-2xl font-black mb-6 uppercase tracking-widest text-slate-800">SA Hub v18</h2>
             <input type="text" id="username" placeholder="Имя аналитика" class="w-full mb-4 p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-            <button onclick="login()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition uppercase">Начать работу</button>
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition uppercase shadow-lg">Войти</button>
         </div>
     </div>
 
     <aside class="w-80 bg-slate-800 text-slate-300 flex flex-col hidden shadow-2xl" id="main-sidebar">
         <div class="p-6 border-b border-slate-700">
-            <h1 class="text-xl font-bold text-white">SA Operating Hub</h1>
+            <h1 class="text-xl font-bold text-white tracking-tight">SA Operating Hub</h1>
             <div id="user-display" class="text-[10px] text-blue-400 mt-1 uppercase font-black"></div>
         </div>
         <div class="p-4 flex-1 overflow-y-auto">
-            <div class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Проекты</div>
+            <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Список Проектов</div>
             <nav id="project-list" class="space-y-1"></nav>
-            <button onclick="createNewProject()" class="w-full mt-6 border border-dashed border-slate-500 p-3 rounded-xl text-[10px] font-bold hover:text-white hover:border-slate-300 transition uppercase">+ Новый проект</button>
+            <button onclick="createNewProject()" class="w-full mt-6 border-2 border-dashed border-slate-600 p-4 rounded-xl text-[10px] font-bold hover:text-white hover:border-blue-400 transition uppercase">+ НОВЫЙ ПРОЕКТ</button>
         </div>
         <div class="p-4 bg-slate-900/40 border-t border-slate-700">
-            <button onclick="openTemplateModal()" class="w-full bg-slate-700 p-4 rounded-xl text-[10px] font-bold uppercase hover:bg-blue-600 transition">Шаблоны NJK</button>
+            <button onclick="openTemplateModal()" class="w-full bg-slate-700 p-4 rounded-xl text-[10px] font-bold uppercase hover:bg-blue-600 transition">NJK Библиотека</button>
         </div>
     </aside>
 
@@ -44,20 +42,21 @@
         <header class="bg-white border-b p-4 flex justify-between items-center px-8 shadow-sm">
             <h2 class="text-lg font-bold text-slate-700" id="active-project-name">Выберите проект</h2>
             <div class="flex gap-3">
-                <button onclick="downloadJSON()" class="text-[10px] font-bold border px-4 py-2 rounded-lg hover:bg-slate-50">JSON</button>
-                <button onclick="saveToStorage(false)" class="text-[10px] font-bold bg-blue-600 text-white px-6 py-2 rounded-lg uppercase shadow-lg hover:bg-blue-700">Сохранить</button>
+                <button onclick="downloadJSON()" class="text-[10px] font-bold border px-4 py-2 rounded-lg hover:bg-slate-50 transition">JSON</button>
+                <button onclick="saveAllToStorage(false)" class="text-[10px] font-bold bg-blue-600 text-white px-6 py-2 rounded-lg uppercase shadow-lg hover:bg-blue-700 transition">Сохранить всё</button>
             </div>
         </header>
         <div class="flex bg-white border-b overflow-x-auto" id="tabs-bar"></div>
         <section class="flex-1 overflow-y-auto p-10 bg-slate-50" id="workspace">
-            <div id="level-ui" class="hidden max-w-4xl">
+            <div id="project-ui" class="max-w-4xl hidden">
                 <div id="lvl-tag" class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black mb-3 uppercase"></div>
-                <h3 class="text-3xl font-black text-slate-900 mb-2" id="lvl-title"></h3>
-                <p class="text-md text-orange-600 italic mb-8" id="lvl-q"></p>
+                <h3 class="text-3xl font-black text-slate-900" id="lvl-title"></h3>
+                <p class="text-md text-orange-600 italic mt-2 mb-8" id="lvl-q"></p>
                 <div id="fields-grid" class="grid grid-cols-1 gap-6 pb-20"></div>
             </div>
             <div id="empty-state" class="flex flex-col items-center justify-center h-full text-slate-400">
-                <p class="font-bold uppercase tracking-widest text-xs">Проект не выбран</p>
+                <div class="text-4xl mb-4 italic">📁</div>
+                <p class="font-bold uppercase tracking-widest text-xs">Создайте или выберите проект слева</p>
             </div>
         </section>
     </main>
@@ -65,23 +64,23 @@
     <div id="template-modal" class="modal">
         <div class="bg-white w-[90%] h-[85vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl">
             <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-                <h3 class="font-black uppercase text-slate-700">Редактор Nunjucks</h3>
-                <button onclick="closeTemplateModal()" class="text-2xl hover:text-red-500">&times;</button>
+                <h3 class="font-black uppercase text-slate-700">Шаблоны Nunjucks</h3>
+                <button onclick="closeTemplateModal()" class="text-2xl hover:text-red-500 transition px-4">&times;</button>
             </div>
             <div class="flex-1 flex overflow-hidden">
                 <div class="w-72 border-r p-4 bg-slate-50 overflow-y-auto" id="modal-tpl-list"></div>
-                <div class="flex-1 p-8 flex flex-col space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="tpl-title" placeholder="Название шаблона" class="p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-400">
-                        <input type="text" id="tpl-filename" placeholder="filename.njk" class="p-3 border rounded-xl text-sm font-mono outline-none focus:ring-2 focus:ring-blue-400">
+                <div class="flex-1 p-8 flex flex-col space-y-4 bg-white">
+                    <div class="grid grid-cols-2 gap-6">
+                        <input type="text" id="tpl-title" placeholder="Имя шаблона" class="p-4 border rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">
+                        <input type="text" id="tpl-filename" placeholder="export_name.njk" class="p-4 border rounded-2xl text-sm font-mono outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">
                     </div>
-                    <textarea id="tpl-content" class="flex-1 p-4 border rounded-xl font-mono text-xs bg-slate-900 text-green-400 outline-none shadow-inner"></textarea>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-4">
-                            <button onclick="deleteTemplateAction()" id="btn-tpl-delete" class="text-red-500 font-bold text-[10px] uppercase hidden hover:underline">Удалить шаблон</button>
-                            <button onclick="downloadTplFile()" id="btn-tpl-download" class="text-blue-600 font-bold text-[10px] uppercase hidden hover:underline">Скачать .njk</button>
+                    <textarea id="tpl-content" class="flex-1 p-6 border rounded-2xl font-mono text-xs bg-slate-900 text-green-400 outline-none leading-relaxed shadow-inner" placeholder="{% for level in levels %}..."></textarea>
+                    <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
+                        <div class="flex gap-6">
+                            <button onclick="deleteTemplateAction()" id="btn-tpl-delete" class="text-red-500 font-bold text-[10px] uppercase hover:underline hidden">Удалить шаблон</button>
+                            <button onclick="downloadTplFile()" id="btn-tpl-download" class="text-blue-600 font-bold text-[10px] uppercase hover:underline hidden">Скачать .NJK</button>
                         </div>
-                        <button onclick="saveTemplateAction()" class="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold uppercase text-xs hover:bg-blue-700">Сохранить шаблон</button>
+                        <button onclick="saveTemplateAction()" class="bg-blue-600 text-white px-12 py-4 rounded-2xl font-bold uppercase text-xs shadow-xl hover:bg-blue-700 transition">Сохранить изменения</button>
                     </div>
                 </div>
             </div>
@@ -89,31 +88,33 @@
     </div>
 
 <script>
-    // КОНФИГУРАЦИЯ (СИНХРОНИЗАЦИЯ С MD)
+    // --- ДАННЫЕ (LEVEL 1 СИНХРОНИЗИРОВАН) ---
     const LEVELS = [
         { n: 1, title: "BUSINESS STRATEGY", q: "Зачем мы это делаем?", fields: [
-            {name: "Business Vision", help: "Видение"}, {name: "Business Goals", isArray: true, help: "Цели"},
-            {name: "Business Objectives", isArray: true, help: "Задачи"}, {name: "KPIs / Success Metrics", isArray: true, help: "KPI"},
-            {name: "Business Constraints", isArray: true, help: "Ограничения"}, {name: "Priorities / Trade-offs", isArray: true, help: "Приоритеты"},
-            {name: "Success Criteria", help: "Критерии успеха"}, {name: "Decision Rules", isArray: true, help: "Правила решений"}
+            {name: "Business Vision", help: "Конечное видение продукта"},
+            {name: "Business Goals", isArray: true, help: "Глобальные цели"},
+            {name: "Business Objectives", isArray: true, help: "Конкретные шаги"},
+            {name: "KPIs / Success Metrics", isArray: true, help: "Измеримые показатели"},
+            {name: "Business Constraints", isArray: true, help: "Ограничения"},
+            {name: "Priorities / Trade-offs", isArray: true, help: "Что важнее?"},
+            {name: "Success Criteria", help: "Критерии успеха"},
+            {name: "Decision Rules", isArray: true, help: "Правила принятия решений"}
         ]},
         { n: 2, title: "BUSINESS REQUIREMENTS", q: "Что нужно бизнесу?", fields: [
-            {name: "Stakeholders", isArray: true, help: "Стейкхолдеры"}, {name: "Context / Scope", help: "Границы"},
-            {name: "Business Rules", isArray: true, help: "Бизнес-правила"}, {name: "Assumptions", isArray: true, help: "Допущения"}
+            {name: "Stakeholders", isArray: true}, {name: "Context / Scope", help: "Границы"},
+            {name: "Business Rules", isArray: true}, {name: "Assumptions", isArray: true}
         ]},
         { n: 3, title: "BUSINESS PROCESSES", q: "Как выглядит процесс?", fields: [
-            {name: "BPMN Diagrams", isArtifact: true, isArray: true, help: "Схемы"}, {name: "Happy Path", help: "Основной поток"},
-            {name: "Alternative Flows", isArray: true, help: "Альтернативы"}
+            {name: "BPMN Diagrams", isArtifact: true, isArray: true}, {name: "Happy Path"}, {name: "Alternative Flows", isArray: true}
         ]},
         { n: 4, title: "PRODUCT REQUIREMENTS", q: "Функционал?", fields: [
-            {name: "User Stories", isArray: true, help: "Истории"}, {name: "Functional Req", isArray: true, help: "Функции"},
-            {name: "UI/UX Mockups", isArtifact: true, isArray: true, help: "Макеты"}
+            {name: "User Stories", isArray: true}, {name: "Functional Req", isArray: true}, {name: "UI/UX Mockups", isArtifact: true, isArray: true}
         ]},
         { n: 5, title: "SYSTEM INTERACTION", q: "Внешние связи?", fields: [
             {name: "Context C4 (L1)", isArtifact: true}, {name: "External Interfaces", isArray: true}
         ]},
         { n: 6, title: "SYSTEM BEHAVIOR", q: "Внутренняя динамика?", fields: [
-            {name: "Sequence Diagrams", isArtifact: true, isArray: true}, {name: "Error Strategy", help: "Ошибки"}
+            {name: "Sequence Diagrams", isArtifact: true, isArray: true}, {name: "Error Strategy"}
         ]},
         { n: 7, title: "SYSTEM STRUCTURE", q: "Данные?", fields: [
             {name: "ER Diagrams", isArtifact: true}, {name: "API Contracts", isArtifact: true, isArray: true}
@@ -122,93 +123,97 @@
             {name: "Container C4 (L2)", isArtifact: true}, {name: "ADR", isArtifact: true, isArray: true}
         ]},
         { n: 9, title: "INFRASTRUCTURE", q: "Развертывание?", fields: [
-            {name: "Deployment Diagram", isArtifact: true}, {name: "Observability", help: "Мониторинг"}
+            {name: "Deployment Diagram", isArtifact: true}, {name: "Observability"}
         ]},
         { n: 10, title: "IMPLEMENTATION", q: "Сопровождение?", fields: [
-            {name: "Ops Manual", help: "Инструкции"}, {name: "Test Assets", isArray: true}
+            {name: "Ops Manual"}, {name: "Test Assets", isArray: true}
         ]}
     ];
 
-    let currentUser = null; let projects = []; let templates = [];
-    let activeProjectId = null; let currentTplId = null;
+    window.projects = []; 
+    window.templates = [];
+    window.currentUser = null;
+    window.activeProjectId = null;
+    window.currentTplId = null;
 
-    // AUTH
+    // --- АВТОРИЗАЦИЯ ---
     function login() {
-        const u = document.getElementById('username').value; if(!u) return;
-        currentUser = u;
+        const name = document.getElementById('username').value;
+        if(!name) return;
+        window.currentUser = name;
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('main-sidebar').classList.remove('hidden');
         document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('user-display').innerText = `Analyst: ${u}`;
-        loadAll();
-    }
-
-    // STORAGE
-    function loadAll() {
-        projects = JSON.parse(localStorage.getItem(`sa_v17_p_${currentUser}`)) || [];
-        templates = JSON.parse(localStorage.getItem(`sa_v17_t_${currentUser}`)) || [
-            {id: 't1', title: 'System Specification', filename: 'spec.njk', content: '# {{name}}'}
+        document.getElementById('user-display').innerText = `Analyst: ${name}`;
+        
+        const savedP = localStorage.getItem(`sa_v18_p_${name}`);
+        const savedT = localStorage.getItem(`sa_v18_t_${name}`);
+        window.projects = savedP ? JSON.parse(savedP) : [];
+        window.templates = savedT ? JSON.parse(savedT) : [
+            {id: 't1', title: 'Full Spec', filename: 'specification.njk', content: '# {{name}}\n\nVision: {{L1_Business_Vision}}'}
         ];
-        refreshUI();
-        if(projects.length > 0) selectProject(projects[0].id);
+        
+        renderProjectSidebar();
+        if(window.projects.length > 0) selectProject(window.projects[0].id);
     }
 
-    function saveToStorage(silent = true) {
-        localStorage.setItem(`sa_v17_p_${currentUser}`, JSON.stringify(projects));
-        localStorage.setItem(`sa_v17_t_${currentUser}`, JSON.stringify(templates));
-        if(!silent) alert("Сохранено!");
+    function saveAllToStorage(silent = true) {
+        localStorage.setItem(`sa_v18_p_${window.currentUser}`, JSON.stringify(window.projects));
+        localStorage.setItem(`sa_v18_t_${window.currentUser}`, JSON.stringify(window.templates));
+        if(!silent) alert("Синхронизировано!");
     }
 
-    function refreshUI() {
-        const list = document.getElementById('project-list');
-        list.innerHTML = projects.map(p => `
-            <div onclick="selectProject(${p.id})" class="sidebar-item group p-3 rounded-xl cursor-pointer text-[10px] font-bold uppercase transition flex justify-between items-center ${activeProjectId === p.id ? 'active' : ''}">
-                <span class="truncate">📄 ${p.name}</span>
-                <button onclick="event.stopPropagation(); deleteProjectAction(${p.id})" class="delete-proj-btn text-red-400 font-bold text-lg">×</button>
-            </div>
-        `).join('');
-    }
-
-    // PROJECT ACTIONS (FIXED)
+    // --- CRUD ПРОЕКТОВ (ПЕРЕПИСАНО НА ПРЯМОЙ ДОСТУП) ---
     function createNewProject() {
-        const name = prompt("Название нового проекта:");
+        const name = prompt("Введите название проекта:");
         if(!name) return;
-        const newProj = { id: Date.now(), name, data: {} };
-        projects.push(newProj);
-        saveToStorage(true);
-        refreshUI();
+        const newProj = { id: Date.now(), name: name, data: {} };
+        window.projects.push(newProj);
+        saveAllToStorage(true);
+        renderProjectSidebar();
         selectProject(newProj.id);
     }
 
     function deleteProjectAction(id) {
-        if(!confirm("Удалить проект?")) return;
-        projects = projects.filter(p => p.id !== id);
-        if(activeProjectId === id) activeProjectId = projects.length > 0 ? projects[0].id : null;
-        saveToStorage(true);
-        refreshUI();
-        selectProject(activeProjectId);
+        if(!confirm("Удалить проект навсегда?")) return;
+        window.projects = window.projects.filter(p => p.id !== id);
+        if(window.activeProjectId === id) {
+            window.activeProjectId = window.projects.length > 0 ? window.projects[0].id : null;
+        }
+        saveAllToStorage(true);
+        renderProjectSidebar();
+        selectProject(window.activeProjectId);
+    }
+
+    function renderProjectSidebar() {
+        const list = document.getElementById('project-list');
+        list.innerHTML = window.projects.map(p => `
+            <div onclick="selectProject(${p.id})" class="sidebar-item group p-3 rounded-xl cursor-pointer text-[10px] font-bold uppercase flex justify-between items-center ${window.activeProjectId === p.id ? 'active' : ''}">
+                <span class="truncate">📄 ${p.name}</span>
+                <button onclick="event.stopPropagation(); deleteProjectAction(${p.id})" class="text-red-400 hover:text-red-600 font-bold px-2">×</button>
+            </div>
+        `).join('');
     }
 
     function selectProject(id) {
-        activeProjectId = id;
-        const p = projects.find(x => x.id === id);
+        window.activeProjectId = id;
+        renderProjectSidebar();
+        const p = window.projects.find(x => x.id === id);
         if(!p) {
-            document.getElementById('empty-state').classList.remove('hidden');
-            document.getElementById('level-ui').classList.add('hidden');
             document.getElementById('active-project-name').innerText = 'Выберите проект';
+            document.getElementById('project-ui').classList.add('hidden');
+            document.getElementById('empty-state').classList.remove('hidden');
             document.getElementById('tabs-bar').innerHTML = '';
-            refreshUI();
             return;
         }
         document.getElementById('empty-state').classList.add('hidden');
-        document.getElementById('level-ui').classList.remove('hidden');
+        document.getElementById('project-ui').classList.remove('hidden');
         document.getElementById('active-project-name').innerText = p.name;
-        refreshUI();
         renderTabs();
         loadLevel(1);
     }
 
-    // TABS & LEVELS
+    // --- РАБОЧАЯ ОБЛАСТЬ ---
     function renderTabs() {
         document.getElementById('tabs-bar').innerHTML = LEVELS.map(l => `
             <button onclick="loadLevel(${l.n})" class="level-tab px-6 py-4 text-[10px] font-black uppercase tab-btn-${l.n}">L${l.n}</button>
@@ -217,14 +222,18 @@
 
     function loadLevel(n) {
         document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
-        const tab = document.querySelector(`.tab-btn-${n}`); if(tab) tab.classList.add('active');
+        const activeTab = document.querySelector(`.tab-btn-${n}`);
+        if(activeTab) activeTab.classList.add('active');
+
         const lvl = LEVELS.find(l => l.n === n);
         document.getElementById('lvl-tag').innerText = `LEVEL ${n} • ${lvl.title}`;
         document.getElementById('lvl-title').innerText = lvl.title;
         document.getElementById('lvl-q').innerText = lvl.q;
         
-        const grid = document.getElementById('fields-grid'); grid.innerHTML = '';
-        const p = projects.find(x => x.id === activeProjectId);
+        const grid = document.getElementById('fields-grid');
+        grid.innerHTML = '';
+        const p = window.projects.find(x => x.id === window.activeProjectId);
+
         lvl.fields.forEach(f => {
             const key = `L${n}_${f.name.replace(/\s+/g, '_').replace(/\//g, '')}`;
             grid.appendChild(createFieldUI(key, f, p.data[key]));
@@ -245,13 +254,13 @@
                 row.className = "p-4 bg-slate-50 border rounded-xl grid grid-cols-2 gap-2 mb-2 relative";
                 row.innerHTML = `
                     <input type="text" placeholder="Заголовок" value="${item.t || ''}" class="p-2 border rounded text-xs art-t">
-                    <input type="text" placeholder="URL" value="${item.u || ''}" class="p-2 border rounded text-xs art-u">
-                    <textarea placeholder="Описание" class="col-span-2 p-2 border rounded text-xs art-d">${item.d || ''}</textarea>
-                    ${conf.isArray ? `<button class="absolute -right-2 -top-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button>` : ''}
+                    <input type="text" placeholder="URL / Path" value="${item.u || ''}" class="p-2 border rounded text-xs art-u">
+                    <textarea placeholder="Метаданные" class="col-span-2 p-2 border rounded text-xs art-d">${item.d || ''}</textarea>
+                    ${conf.isArray ? `<button class="absolute -right-2 -top-2 bg-red-500 text-white rounded-full w-5 h-5 text-[10px]">×</button>` : ''}
                 `;
                 row.querySelectorAll('input, textarea').forEach(el => el.oninput = () => {
                     const allRows = container.querySelectorAll('div');
-                    projects.find(p => p.id === activeProjectId).data[key] = Array.from(allRows).map(r => ({
+                    window.projects.find(p => p.id === window.activeProjectId).data[key] = Array.from(allRows).map(r => ({
                         t: r.querySelector('.art-t').value, u: r.querySelector('.art-u').value, d: r.querySelector('.art-d').value
                     }));
                 });
@@ -260,110 +269,126 @@
             });
             card.appendChild(container);
             if(conf.isArray) {
-                const addBtn = document.createElement('button');
-                addBtn.className = "text-[9px] font-bold text-green-600 uppercase mt-2";
-                addBtn.innerText = "+ Добавить артефакт";
-                addBtn.onclick = () => { val = projects.find(p => p.id === activeProjectId).data[key] || []; val.push({}); projects.find(p => p.id === activeProjectId).data[key] = val; loadLevel(parseInt(key.match(/\d+/)[0])); };
-                card.appendChild(addBtn);
+                const btn = document.createElement('button');
+                btn.className = "text-[9px] font-bold text-green-600 uppercase mt-2";
+                btn.innerText = "+ Добавить артефакт";
+                btn.onclick = () => { 
+                    let current = window.projects.find(p => p.id === window.activeProjectId).data[key] || [];
+                    current.push({}); window.projects.find(p => p.id === window.activeProjectId).data[key] = current;
+                    loadLevel(parseInt(key.match(/\d+/)[0]));
+                };
+                card.appendChild(btn);
             }
         } else if (conf.isArray) {
             const container = document.createElement('div');
             (val || ['']).forEach((v, idx) => {
-                const d = document.createElement('div'); d.className = "flex gap-2 mb-2";
-                d.innerHTML = `<input type="text" value="${v}" class="flex-1 p-2 bg-slate-50 border rounded-lg text-sm">
-                               <button class="text-red-400 font-bold px-2">×</button>`;
-                d.querySelector('input').oninput = (e) => {
-                    const allInp = container.querySelectorAll('input');
-                    projects.find(p => p.id === activeProjectId).data[key] = Array.from(allInp).map(i => i.value);
+                const div = document.createElement('div'); div.className = "flex gap-2 mb-2";
+                div.innerHTML = `<input type="text" value="${v}" class="flex-1 p-2 bg-slate-50 border rounded-lg text-sm">
+                                 <button class="text-red-400 font-bold px-2">×</button>`;
+                div.querySelector('input').oninput = () => {
+                    const allInps = container.querySelectorAll('input');
+                    window.projects.find(p => p.id === window.activeProjectId).data[key] = Array.from(allInps).map(i => i.value);
                 };
-                d.querySelector('button').onclick = () => { d.remove(); d.querySelector('input').dispatchEvent(new Event('input')); };
-                container.appendChild(d);
+                div.querySelector('button').onclick = () => { div.remove(); div.querySelector('input').dispatchEvent(new Event('input')); };
+                container.appendChild(div);
             });
             card.appendChild(container);
-            const addBtn = document.createElement('button');
-            addBtn.className = "text-[9px] font-bold text-blue-500 uppercase mt-2";
-            addBtn.innerText = "+ Добавить пункт";
-            addBtn.onclick = () => { val = projects.find(p => p.id === activeProjectId).data[key] || []; val.push(''); projects.find(p => p.id === activeProjectId).data[key] = val; loadLevel(parseInt(key.match(/\d+/)[0])); };
-            card.appendChild(addBtn);
+            const btn = document.createElement('button');
+            btn.className = "text-[9px] font-bold text-blue-500 uppercase mt-2";
+            btn.innerText = "+ Добавить пункт";
+            btn.onclick = () => {
+                let current = window.projects.find(p => p.id === window.activeProjectId).data[key] || [];
+                current.push(''); window.projects.find(p => p.id === window.activeProjectId).data[key] = current;
+                loadLevel(parseInt(key.match(/\d+/)[0]));
+            };
+            card.appendChild(btn);
         } else {
             const tx = document.createElement('textarea');
             tx.className = "w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm min-h-[80px] outline-none focus:ring-2 focus:ring-blue-100";
             tx.value = val || '';
-            tx.oninput = (e) => projects.find(p => p.id === activeProjectId).data[key] = e.target.value;
+            tx.oninput = (e) => window.projects.find(p => p.id === window.activeProjectId).data[key] = e.target.value;
             card.appendChild(tx);
         }
         return card;
     }
 
-    // NJK TEMPLATES ACTION (FIXED)
-    function openTemplateModal() { document.getElementById('template-modal').classList.add('active'); refreshTplList(); resetTplEditor(); }
+    // --- CRUD ШАБЛОНОВ ---
+    function openTemplateModal() { 
+        document.getElementById('template-modal').classList.add('active'); 
+        refreshTplModalList(); 
+        resetTplEditor();
+    }
     function closeTemplateModal() { document.getElementById('template-modal').classList.remove('active'); }
 
-    function refreshTplList() {
+    function refreshTplModalList() {
         const list = document.getElementById('modal-tpl-list');
-        list.innerHTML = templates.map(t => `
-            <div onclick="editTemplateAction('${t.id}')" class="p-3 mb-2 bg-white border-2 rounded-xl cursor-pointer text-[10px] font-bold uppercase transition ${currentTplId === t.id ? 'border-blue-500 bg-blue-50' : 'border-transparent'}">
+        list.innerHTML = window.templates.map(t => `
+            <div onclick="editTemplateAction('${t.id}')" class="p-4 mb-2 bg-white border-2 rounded-2xl cursor-pointer text-[10px] font-bold uppercase transition ${window.currentTplId === t.id ? 'border-blue-500 bg-blue-50' : 'border-transparent'}">
                 ${t.title}
             </div>
-        `).join('') + `<button onclick="resetTplEditor()" class="w-full text-blue-500 text-[9px] font-black mt-4 uppercase">+ Новый шаблон</button>`;
+        `).join('') + `<button onclick="resetTplEditor()" class="w-full text-blue-500 text-[10px] font-black mt-6 uppercase">+ Создать шаблон</button>`;
     }
 
     function editTemplateAction(id) {
-        currentTplId = id; const t = templates.find(x => x.id === id);
+        window.currentTplId = id;
+        const t = window.templates.find(x => x.id === id);
         document.getElementById('tpl-title').value = t.title;
         document.getElementById('tpl-filename').value = t.filename;
         document.getElementById('tpl-content').value = t.content;
         document.getElementById('btn-tpl-delete').classList.remove('hidden');
         document.getElementById('btn-tpl-download').classList.remove('hidden');
-        refreshTplList();
+        refreshTplModalList();
     }
 
     function resetTplEditor() {
-        currentTplId = null;
+        window.currentTplId = null;
         document.getElementById('tpl-title').value = '';
         document.getElementById('tpl-filename').value = '';
         document.getElementById('tpl-content').value = '';
         document.getElementById('btn-tpl-delete').classList.add('hidden');
         document.getElementById('btn-tpl-download').classList.add('hidden');
-        refreshTplList();
+        refreshTplModalList();
     }
 
     function saveTemplateAction() {
         const title = document.getElementById('tpl-title').value;
-        const filename = document.getElementById('tpl-filename').value;
-        const content = document.getElementById('tpl-content').value;
-        if(!title || !filename) return alert("Заполните поля");
+        const fname = document.getElementById('tpl-filename').value;
+        const body = document.getElementById('tpl-content').value;
+        if(!title || !fname) return alert("Заполните Название и Имя файла!");
 
-        if(currentTplId) {
-            const t = templates.find(x => x.id === currentTplId);
-            t.title = title; t.filename = filename; t.content = content;
+        if(window.currentTplId) {
+            const t = window.templates.find(x => x.id === window.currentTplId);
+            t.title = title; t.filename = fname; t.content = body;
         } else {
-            templates.push({id: 't'+Date.now(), title, filename, content});
+            window.templates.push({ id: 't' + Date.now(), title, filename: fname, content: body });
         }
-        saveToStorage(true); refreshTplList(); resetTplEditor();
+        saveAllToStorage(true);
+        refreshTplModalList();
+        resetTplEditor();
     }
 
     function deleteTemplateAction() {
-        if(!currentTplId || !confirm("Удалить шаблон?")) return;
-        templates = templates.filter(t => t.id !== currentTplId);
-        saveToStorage(true);
+        if(!window.currentTplId) return;
+        if(!confirm("Удалить этот шаблон?")) return;
+        window.templates = window.templates.filter(t => t.id !== window.currentTplId);
+        saveAllToStorage(true);
         resetTplEditor();
     }
 
     function downloadTplFile() {
-        if(!currentTplId) return;
-        const t = templates.find(x => x.id === currentTplId);
+        if(!window.currentTplId) return;
+        const t = window.templates.find(x => x.id === window.currentTplId);
         const blob = new Blob([t.content], {type: 'text/plain'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = t.filename || 'template.njk'; a.click();
     }
 
     function downloadJSON() {
-        const p = projects.find(x => x.id === activeProjectId);
+        const p = window.projects.find(x => x.id === window.activeProjectId);
         if(!p) return;
         const blob = new Blob([JSON.stringify(p, null, 2)], {type: 'application/json'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = `SA_v17_${p.name}.json`; a.click();
+        a.download = `SA_Hub_${p.name}.json`; a.click();
     }
 </script>
 </body>
