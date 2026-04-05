@@ -1,0 +1,47 @@
+# Техническое задание: {{ name | default("Системный анализ") }}
+*Дата генерации: {{ metadata.export_date }}*
+
+{# Функция-хелпер для проверки на массив (в Nunjucks нет встроенной) #}
+{# Предполагаем, что шаблонизатор запущен с расширением is_array #}
+
+{% for lvl_conf in metadata.levels_config %}
+{% set lvl_id = "L" + lvl_conf.n %}
+<details>
+  <summary><b>LEVEL {{ lvl_conf.n }} — {{ lvl_conf.title }}</b></summary>
+  
+  <p><i>{{ lvl_conf.q }}</i></p>
+
+  {# Пробегаемся по полям уровня, заданным в конфигурации #}
+  {% for field in lvl_conf.fields %}
+    {% set field_key = lvl_id + "_" + field.name %}
+    {% set field_value = data[field_key] %}
+
+    {% if field_value %}
+      <h3>{{ field.name }}</h3>
+      
+      {# ЛОГИКА ОТОБРАЖЕНИЯ СХЕМ (если поле помечено isArray и содержит Path) #}
+      {% if field.isArray and "Path" in field.name %}
+        {% for path in field_value %}
+          ![Схема ({{ field.name }})]({{ path }})
+        {% endfor %}
+      
+      {# ЛОГИКА ОТОБРАЖЕНИЯ СПИСКОВ #}
+      {% elif field.isArray %}
+        <ul>
+          {% for item in field_value %}
+            <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      
+      {# ОБЫЧНЫЙ ТЕКСТ #}
+      {% else %}
+        <p>{{ field_value | nl2br }}</p>
+      {% endif %}
+    {% endif %}
+
+  {% endfor %}
+</details>
+{% endfor %}
+
+---
+*Сгенерировано автоматически на основе SA Operating Map v3.*
