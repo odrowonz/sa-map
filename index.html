@@ -2,11 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>SA Master Hub v13 | Exact MD Restoration</title>
+    <title>SA Master Hub v14 | Full Functional Restoration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .level-tab.active { border-bottom: 4px solid #3b82f6; color: #3b82f6; font-weight: bold; background: #eff6ff; }
         .sidebar-item.active { background: #334155; border-left: 4px solid #3b82f6; color: white; }
+        .sidebar-item .delete-proj-btn { opacity: 0; transition: opacity 0.2s; }
+        .sidebar-item:hover .delete-proj-btn { opacity: 1; }
         .artifact-card { border-left: 4px solid #10b981; }
         .help-text { font-size: 0.7rem; color: #64748b; margin-top: 0.3rem; line-height: 1.2; font-style: italic; }
         ::-webkit-scrollbar { width: 5px; }
@@ -19,7 +21,7 @@
 
     <div id="auth-screen" class="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl w-[400px] text-center">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-widest">SA Hub v13</h2>
+            <h2 class="text-2xl font-black mb-6 uppercase tracking-widest">SA Hub v14</h2>
             <input type="text" id="username" placeholder="Имя аналитика" class="w-full mb-4 p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
             <button onclick="login()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition uppercase">Начать работу</button>
         </div>
@@ -31,6 +33,7 @@
             <div id="user-display" class="text-[10px] text-blue-400 mt-1 uppercase font-black"></div>
         </div>
         <div class="p-4 flex-1 overflow-y-auto">
+            <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Проекты</div>
             <nav id="project-list" class="space-y-1"></nav>
             <button onclick="createNewProject()" class="w-full mt-4 border border-dashed border-slate-600 p-2 rounded-lg text-[10px] font-bold hover:text-white transition">+ НОВЫЙ ПРОЕКТ</button>
         </div>
@@ -61,22 +64,31 @@
     </main>
 
     <div id="template-modal" class="modal">
-        <div class="bg-white w-[90%] h-[85vh] rounded-3xl overflow-hidden flex flex-col">
-            <div class="p-6 border-b flex justify-between items-center">
-                <h3 class="font-black uppercase">Nunjucks Library</h3>
-                <button onclick="closeTemplateModal()" class="text-2xl">&times;</button>
+        <div class="bg-white w-[90%] h-[85vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl">
+            <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+                <h3 class="font-black uppercase text-slate-700">Nunjucks Template Editor</h3>
+                <button onclick="closeTemplateModal()" class="text-2xl hover:text-red-500">&times;</button>
             </div>
             <div class="flex-1 flex overflow-hidden">
-                <div class="w-64 border-r p-4 bg-slate-50 overflow-y-auto" id="modal-tpl-list"></div>
-                <div class="flex-1 p-6 flex flex-col space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="tpl-title" placeholder="Название" class="p-3 border rounded-xl">
-                        <input type="text" id="tpl-filename" placeholder="filename.njk" class="p-3 border rounded-xl font-mono">
+                <div class="w-72 border-r p-4 bg-slate-50 overflow-y-auto" id="modal-tpl-list"></div>
+                <div class="flex-1 p-8 flex flex-col space-y-4">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="flex flex-col">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Название шаблона</label>
+                            <input type="text" id="tpl-title" class="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-400">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Имя файла</label>
+                            <input type="text" id="tpl-filename" class="p-3 border rounded-xl font-mono outline-none focus:ring-2 focus:ring-blue-400">
+                        </div>
                     </div>
-                    <textarea id="tpl-content" class="flex-1 p-4 border rounded-xl font-mono text-xs bg-slate-900 text-green-400" placeholder="Код шаблона..."></textarea>
-                    <div class="flex justify-end gap-3">
-                        <button onclick="deleteTemplate()" id="btn-tpl-delete" class="text-red-500 font-bold hidden">Удалить</button>
-                        <button onclick="saveTemplate()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold uppercase text-xs">Сохранить</button>
+                    <div class="flex-1 flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase mb-1">Код (NJK/Markdown)</label>
+                        <textarea id="tpl-content" class="flex-1 p-4 border rounded-xl font-mono text-xs bg-slate-900 text-green-400 outline-none leading-relaxed shadow-inner"></textarea>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <button onclick="deleteTemplate()" id="btn-tpl-delete" class="text-red-500 font-bold text-xs uppercase hover:underline invisible">Удалить шаблон</button>
+                        <button onclick="saveTemplate()" class="bg-blue-600 text-white px-10 py-3 rounded-xl font-bold uppercase text-xs shadow-lg hover:bg-blue-700 transition">Сохранить</button>
                     </div>
                 </div>
             </div>
@@ -84,7 +96,7 @@
     </div>
 
 <script>
-    // --- ПОЛНАЯ СИНХРОНИЗАЦИЯ С MD (100% восстановление полей) ---
+    // --- КОНФИГУРАЦИЯ (Sychronized with MD) ---
     const LEVELS = [
         { n: 1, title: "BUSINESS STRATEGY", q: "Зачем мы это делаем?", fields: [
             {name: "Business Vision", help: "Конечное видение продукта"},
@@ -146,37 +158,48 @@
         ]}
     ];
 
-    // --- LOGIC ---
     let currentUser = null; let projects = []; let templates = [];
     let activeProjectId = null; let currentTplId = null;
 
+    // --- AUTH & CORE ---
     function login() {
         const u = document.getElementById('username').value;
         if(!u) return; currentUser = u;
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('main-sidebar').classList.remove('hidden');
         document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('user-display').innerText = `SA: ${u}`;
+        document.getElementById('user-display').innerText = `Analyst: ${u}`;
         init();
     }
 
     function init() {
-        projects = JSON.parse(localStorage.getItem(`sa_hub_v13_p_${currentUser}`)) || [];
-        templates = JSON.parse(localStorage.getItem(`sa_hub_v13_t_${currentUser}`)) || [
-            {id:'t1', title:'Full Report', filename:'report.njk', content:'# {{name}}'}
+        projects = JSON.parse(localStorage.getItem(`sa_v14_p_${currentUser}`)) || [];
+        templates = JSON.parse(localStorage.getItem(`sa_v14_t_${currentUser}`)) || [
+            {id:'t1', title:'System Spec', filename:'spec.md', content:'# {{name}}\n\n## Vision\n{{L1_Business_Vision}}'}
         ];
         renderProjectList();
         if(projects.length > 0) selectProject(projects[0].id);
     }
 
     function saveAll(silent=false) {
-        localStorage.setItem(`sa_hub_v13_p_${currentUser}`, JSON.stringify(projects));
-        localStorage.setItem(`sa_hub_v13_t_${currentUser}`, JSON.stringify(templates));
-        if(!silent) alert("Данные сохранены!");
+        localStorage.setItem(`sa_v14_p_${currentUser}`, JSON.stringify(projects));
+        localStorage.setItem(`sa_v14_t_${currentUser}`, JSON.stringify(templates));
+        if(!silent) alert("Данные синхронизированы.");
+    }
+
+    // --- PROJECT ACTIONS ---
+    function renderProjectList() {
+        document.getElementById('project-list').innerHTML = projects.map(p => `
+            <div onclick="selectProject(${p.id})" class="sidebar-item group p-3 rounded-xl cursor-pointer text-[10px] font-bold uppercase transition flex justify-between items-center ${activeProjectId === p.id ? 'active' : ''}">
+                <span class="truncate pr-2 italic">📄 ${p.name}</span>
+                <button onclick="event.stopPropagation(); deleteProject(${p.id})" class="delete-proj-btn text-slate-400 hover:text-red-500 font-bold text-lg leading-none">×</button>
+            </div>
+        `).join('');
     }
 
     function createNewProject() {
-        const name = prompt("Название проекта:"); if(!name) return;
+        const name = prompt("Название нового проекта:");
+        if(!name) return;
         const p = { id: Date.now(), name, data: {} };
         projects.push(p); saveAll(true); renderProjectList(); selectProject(p.id);
     }
@@ -186,14 +209,16 @@
         document.getElementById('active-project-name').innerText = projects.find(p => p.id === id).name;
     }
 
-    function renderProjectList() {
-        document.getElementById('project-list').innerHTML = projects.map(p => `
-            <div onclick="selectProject(${p.id})" class="sidebar-item p-3 rounded-xl cursor-pointer text-[10px] font-bold uppercase transition ${activeProjectId === p.id ? 'active' : ''}">
-                📄 ${p.name}
-            </div>
-        `).join('');
+    function deleteProject(id) {
+        if(!confirm("Удалить этот проект навсегда?")) return;
+        projects = projects.filter(p => p.id !== id);
+        if(activeProjectId === id) activeProjectId = projects.length > 0 ? projects[0].id : null;
+        saveAll(true); renderProjectList(); 
+        if(activeProjectId) selectProject(activeProjectId);
+        else location.reload();
     }
 
+    // --- UI ENGINE ---
     function renderTabs() {
         document.getElementById('tabs-bar').innerHTML = LEVELS.map(l => `
             <button onclick="loadLevel(${l.n})" class="level-tab px-6 py-4 text-[10px] font-black uppercase tab-btn-${l.n}">L${l.n}</button>
@@ -212,7 +237,7 @@
         const p = projects.find(x => x.id === activeProjectId);
 
         lvl.fields.forEach(f => {
-            const key = `L${n}_${f.name.replace(/\s+/g, '_')}`;
+            const key = `L${n}_${f.name.replace(/\s+/g, '_').replace(/\//g, '')}`;
             grid.appendChild(createField(key, f, p.data[key]));
         });
     }
@@ -259,12 +284,12 @@
 
     function createArtifactRow(key, item, isArray) {
         const div = document.createElement('div');
-        div.className = "p-4 bg-slate-50 border rounded-xl grid grid-cols-2 gap-3 relative";
+        div.className = "p-4 bg-slate-50 border rounded-xl grid grid-cols-2 gap-3 relative shadow-inner";
         div.innerHTML = `
             <input type="text" placeholder="Заголовок" value="${item.t || ''}" class="p-2 border rounded text-xs art-in" data-f="t">
             <input type="text" placeholder="URL Скриншота" value="${item.u || ''}" class="p-2 border rounded text-xs art-in" data-f="u">
-            <textarea placeholder="Описание" class="col-span-2 p-2 border rounded text-xs art-in" data-f="d">${item.d || ''}</textarea>
-            ${isArray ? `<button onclick="this.parentElement.remove(); updateArt('${key}')" class="absolute -right-2 -top-2 bg-white border rounded-full w-5 h-5 text-red-500 text-xs shadow-sm">&times;</button>` : ''}
+            <textarea placeholder="Методология / Описание" class="col-span-2 p-2 border rounded text-xs art-in" data-f="d">${item.d || ''}</textarea>
+            ${isArray ? `<button onclick="this.parentElement.remove(); updateArt('${key}')" class="absolute -right-2 -top-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs shadow hover:bg-red-600">&times;</button>` : ''}
         `;
         div.querySelectorAll('.art-in').forEach(i => i.oninput = () => updateArt(key));
         return div;
@@ -272,8 +297,8 @@
 
     function createSimpleRow(key, val) {
         const d = document.createElement('div'); d.className = "flex gap-2";
-        d.innerHTML = `<input type="text" value="${val}" class="flex-1 p-2 bg-slate-50 border rounded-lg text-sm" oninput="updateArr('${key}')">
-                       <button onclick="this.parentElement.remove(); updateArr('${key}')" class="text-slate-300 hover:text-red-500 px-2">&times;</button>`;
+        d.innerHTML = `<input type="text" value="${val}" class="flex-1 p-2 bg-slate-50 border rounded-lg text-sm outline-none" oninput="updateArr('${key}')">
+                       <button onclick="this.parentElement.remove(); updateArr('${key}')" class="text-slate-300 hover:text-red-500 px-2 font-black text-lg">&times;</button>`;
         return d;
     }
 
@@ -289,30 +314,47 @@
         });
     }
 
-    // --- TEMPLATE MODAL LOGIC ---
-    function openTemplateModal() { document.getElementById('template-modal').classList.add('active'); renderModalTplList(); }
+    // --- TEMPLATE CRUD (FIXED) ---
+    function openTemplateModal() { 
+        document.getElementById('template-modal').classList.add('active'); 
+        renderModalTplList(); 
+        resetTpl();
+    }
     function closeTemplateModal() { document.getElementById('template-modal').classList.remove('active'); }
+    
     function renderModalTplList() {
         document.getElementById('modal-tpl-list').innerHTML = templates.map(t => `
-            <div onclick="editTemplate('${t.id}')" class="p-3 mb-2 bg-white border rounded-xl cursor-pointer hover:border-blue-400 text-[10px] font-bold uppercase">${t.title}</div>
-        `).join('') + `<button onclick="resetTpl()" class="w-full text-blue-500 text-[9px] font-bold mt-4">+ НОВЫЙ ШАБЛОН</button>`;
+            <div onclick="editTemplate('${t.id}')" class="p-3 mb-2 bg-white border-2 rounded-xl cursor-pointer hover:border-blue-400 text-[10px] font-bold uppercase transition ${currentTplId === t.id ? 'border-blue-500 bg-blue-50' : 'border-transparent'}">
+                ${t.title}
+            </div>
+        `).join('') + `<button onclick="resetTpl()" class="w-full text-blue-500 text-[9px] font-black mt-4 uppercase">+ Новый шаблон</button>`;
     }
+
     function editTemplate(id) {
         currentTplId = id; const t = templates.find(x => x.id === id);
         document.getElementById('tpl-title').value = t.title;
         document.getElementById('tpl-filename').value = t.filename;
         document.getElementById('tpl-content').value = t.content;
-        document.getElementById('btn-tpl-delete').classList.remove('hidden');
+        const delBtn = document.getElementById('btn-tpl-delete');
+        delBtn.classList.remove('invisible');
+        renderModalTplList();
     }
+
     function resetTpl() {
-        currentTplId = null; document.getElementById('tpl-title').value = '';
-        document.getElementById('tpl-filename').value = ''; document.getElementById('tpl-content').value = '';
-        document.getElementById('btn-tpl-delete').classList.add('hidden');
+        currentTplId = null; 
+        document.getElementById('tpl-title').value = '';
+        document.getElementById('tpl-filename').value = ''; 
+        document.getElementById('tpl-content').value = '';
+        document.getElementById('btn-tpl-delete').classList.add('invisible');
+        renderModalTplList();
     }
+
     function saveTemplate() {
         const title = document.getElementById('tpl-title').value;
         const filename = document.getElementById('tpl-filename').value;
         const content = document.getElementById('tpl-content').value;
+        if(!title || !filename) return alert("Заполните название и имя файла!");
+
         if(currentTplId) {
             const t = templates.find(x => x.id === currentTplId);
             t.title = title; t.filename = filename; t.content = content;
@@ -321,11 +363,21 @@
         }
         saveAll(true); renderModalTplList(); resetTpl();
     }
+
+    function deleteTemplate() {
+        if(!currentTplId) return;
+        if(confirm("Удалить этот шаблон?")) {
+            templates = templates.filter(t => t.id !== currentTplId);
+            saveAll(true); renderModalTplList(); resetTpl();
+        }
+    }
+
     function downloadJSON() {
         const p = projects.find(x => x.id === activeProjectId);
+        if(!p) return;
         const blob = new Blob([JSON.stringify(p, null, 2)], {type: 'application/json'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = `SA_Hub_v13_${p.name}.json`; a.click();
+        a.download = `SA_Project_${p.name.replace(/\s+/g, '_')}.json`; a.click();
     }
 </script>
 </body>
