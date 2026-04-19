@@ -67,4 +67,19 @@
             'upstreamElements' => $upstreamElements,
         ])
     </article>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var hash = window.location.hash;
+            if (!hash || hash.length < 2) return;
+            var id = hash.slice(1);
+            if (!id || id.indexOf('artifact-') !== 0) return;
+            var node = document.getElementById(id);
+            if (node && node.tagName === 'DETAILS') {
+                node.open = true;
+                requestAnimationFrame(function () {
+                    node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            }
+        });
+    </script>
 @endsection

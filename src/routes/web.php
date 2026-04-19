@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ElementController;
 use App\Http\Controllers\ProjectController;
@@ -34,6 +35,9 @@ $routes = static function () use ($home) {
         Route::post('projects/{project}/elements', [ElementController::class, 'store'])->name('elements.store');
         Route::patch('projects/{project}/elements/{element}', [ElementController::class, 'update'])->name('elements.update');
         Route::delete('projects/{project}/elements/{element}', [ElementController::class, 'destroy'])->name('elements.destroy');
+        Route::post('projects/{project}/elements/{element}/attachments', [AttachmentController::class, 'store'])->name('attachments.store');
+        Route::get('projects/{project}/attachments/{attachment}/file', [AttachmentController::class, 'file'])->name('attachments.file');
+        Route::delete('projects/{project}/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
         Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     });
 };

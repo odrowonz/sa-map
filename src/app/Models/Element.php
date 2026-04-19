@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Element extends Model
@@ -39,9 +41,29 @@ class Element extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Element $element) {
+            foreach ($element->attachments as $attachment) {
+                if ($attachment->elements()->count() === 1) {
+                    Storage::disk('local')->delete($attachment->storage_key);
+                    $attachment->delete();
+                } else {
+                    $attachment->elements()->detach($element->id);
+                }
+            }
+        });
+    }
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function attachments(): BelongsToMany
+    {
+        return $this->belongsToMany(Attachment::class, 'sa_attachment_element', 'element_id', 'attachment_id')
+            ->orderBy('sa_attachments.id');
     }
 
     public function label(): string

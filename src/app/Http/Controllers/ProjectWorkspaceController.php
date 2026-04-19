@@ -33,6 +33,7 @@ class ProjectWorkspaceController extends Controller
         $elements = Element::query()
             ->where('project_id', $project->id)
             ->where('level', $level)
+            ->with('attachments')
             ->orderBy('artifact_key')
             ->orderBy('sort_order')
             ->get();

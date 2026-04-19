@@ -37,7 +37,7 @@
             name="body"
             rows="6"
             class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="Текст, списки, ссылки на схемы (вложения — позже по ТЗ)…"
+            placeholder="Текст и списки; файлы и PNG — в блоке «Вложения» ниже (после сохранения записи)."
         >{{ is_string($body) ? $body : '' }}</textarea>
     </div>
 
@@ -76,6 +76,12 @@
                 <p class="mt-1 text-xs text-slate-500">Ctrl+клик для нескольких значений.</p>
             @endif
         </div>
+    @endif
+
+    @if (! $isNew && $element)
+        @include('sa-map.project.partials.element-attachments', ['project' => $project, 'element' => $element])
+    @elseif ($isNew)
+        <p class="mt-4 text-sm text-slate-500">После сохранения записи здесь появится загрузка вложений к артефакту.</p>
     @endif
 
     <div class="flex flex-wrap items-center gap-3 pt-1">
