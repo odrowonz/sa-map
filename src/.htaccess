@@ -1,0 +1,4 @@
+Options +FollowSymLinks -Indexes
+
+# Корень /sa-map/ → public/index.php
+DirectoryIndex public/index.php

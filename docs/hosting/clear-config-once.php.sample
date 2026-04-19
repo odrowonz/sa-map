@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Одноразовый сброс кэша конфигурации Laravel без SSH.
+ *
+ * 1. Скопируйте этот файл в sa-map/public/ под именем clear-config-once.php
+ * 2. Замените REPLACE_ME_SECRET на длинную случайную строку (не коммитьте в Git).
+ * 3. Откройте в браузере (см. ниже), убедитесь в ответе OK.
+ * 4. Удалите файл clear-config-once.php с сервера.
+ */
+
+declare(strict_types=1);
+
+$secret = 'REPLACE_ME_SECRET';
+
+header('Content-Type: text/plain; charset=utf-8');
+
+if (! isset($_GET['key']) || ! hash_equals($secret, (string) $_GET['key'])) {
+    http_response_code(403);
+    echo 'Forbidden';
+
+    exit;
+}
+
+require __DIR__.'/../vendor/autoload.php';
+
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+/** @var \Illuminate\Contracts\Console\Kernel $kernel */
+$kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
+
+$kernel->call('config:clear');
+
+echo "OK: config cache cleared.\n";
+echo "Delete this file from the server now.\n";

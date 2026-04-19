@@ -1,0 +1,13 @@
+# Локальные и секретные файлы (раскомментируйте при необходимости)
+# docs/hosting/it-senior.kz.md
+
+# Учётные данные БД приложения SA Map (пароль)
+docs/hosting/sa-map-database.md
+
+# Сборки и зависимости (когда появятся)
+build/dist/
+build/_dist_pack.zip
+node_modules/
+vendor/
+.env
+.env.*
