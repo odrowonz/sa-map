@@ -1,4 +1,13 @@
 Options +FollowSymLinks -Indexes
 
-# Корень /sa-map/ → public/index.php
 DirectoryIndex public/index.php
+
+# Без этого запросы вида /sa-map/login не доходят до Laravel (только /sa-map/ с DirectoryIndex).
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /sa-map/
+    # Иначе пустой путь давал public/ и 403 на части хостингов
+    RewriteRule ^$ public/index.php [L]
+    RewriteCond %{REQUEST_URI} !^/sa-map/public/
+    RewriteRule ^(.+)$ public/$1 [L]
+</IfModule>
