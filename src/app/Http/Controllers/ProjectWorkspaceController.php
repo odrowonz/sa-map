@@ -50,11 +50,25 @@ class ProjectWorkspaceController extends Controller
                 ->get()
             : collect();
 
+        $validArtifactKeys = collect($artifacts)->pluck('key')->all();
+        $artifactFilter = $request->query('artifact');
+        if (! is_string($artifactFilter) || ! in_array($artifactFilter, $validArtifactKeys, true)) {
+            $artifactFilter = null;
+        }
+
+        $artifactFilterLabel = null;
+        if ($artifactFilter !== null) {
+            $match = collect($artifacts)->firstWhere('key', $artifactFilter);
+            $artifactFilterLabel = is_array($match) ? ($match['label'] ?? $artifactFilter) : $artifactFilter;
+        }
+
         return view('sa-map.project.level', [
             'project' => $project,
             'level' => $level,
             'levelMeta' => $levels[$level],
             'artifacts' => $artifacts,
+            'artifactFilter' => $artifactFilter,
+            'artifactFilterLabel' => $artifactFilterLabel,
             'elementsByArtifact' => $elementsByArtifact,
             'upstreamElements' => $upstreamElements,
         ]);

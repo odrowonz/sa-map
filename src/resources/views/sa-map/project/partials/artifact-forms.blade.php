@@ -1,61 +1,59 @@
 @php
     /** @var \Illuminate\Support\Collection<string, \Illuminate\Support\Collection<int, \App\Models\Element>> $elementsByArtifact */
+    /** @var list<array{key: string, label: string, multiple: bool, elementCount?: int}> $artifacts */
 @endphp
 
-<div class="mt-8 space-y-3">
+<div class="artifact-sections mx-auto w-full max-w-4xl space-y-8" id="artifact-sections-root">
     @foreach ($artifacts as $artifact)
         @php
             $key = $artifact['key'];
             $rows = $elementsByArtifact->get($key, collect());
             $fragmentId = 'artifact-'.$key;
-            $hasContent = $rows->isNotEmpty();
+            $count = (int) ($artifact['elementCount'] ?? ($artifact['multiple'] ? $rows->count() : ($rows->isNotEmpty() ? 1 : 0)));
+            $labelLower = mb_strtolower($artifact['label']);
         @endphp
 
-        <details id="{{ $fragmentId }}" class="group scroll-mt-28 rounded-lg border border-slate-200 bg-white shadow-sm open:ring-1 open:ring-slate-200/80">
-            <summary
-                class="flex cursor-pointer list-none items-center gap-3 px-4 py-3 text-left [&::-webkit-details-marker]:hidden"
-            >
-                <span
-                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-500 transition group-open:border-slate-300 group-open:bg-slate-100"
-                    aria-hidden="true"
-                >
-                    <svg
-                        class="h-4 w-4 shrink-0 transition-transform group-open:rotate-180"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </span>
-                <span class="min-w-0 flex-1">
-                    <span class="block text-base font-semibold text-slate-800">{{ $artifact['label'] }}</span>
-                    <span class="mt-0.5 block text-xs text-slate-400">
-                        {{ $key }}
-                        @if ($artifact['multiple'])
-                            · несколько записей
-                        @else
-                            · одна запись
+        <section
+            id="{{ $fragmentId }}"
+            data-artifact-section
+            data-artifact-key="{{ $key }}"
+            data-artifact-label="{{ $labelLower }}"
+            class="artifact-section scroll-mt-24 rounded-2xl border border-slate-200/90 bg-white shadow-sm"
+        >
+            <header class="border-b border-slate-100 px-5 py-4">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ $key }}</p>
+                        <h2 class="mt-1 text-base font-bold text-slate-900">{{ $artifact['label'] }}</h2>
+                        <p class="mt-0.5 text-xs text-slate-500">
+                            @if ($artifact['multiple'])
+                                Несколько записей
+                            @else
+                                Одна запись
+                            @endif
+                        </p>
+                    </div>
+                    <div class="flex shrink-0 flex-wrap items-center gap-2">
+                        <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 tabular-nums" title="Количество записей по этому типу">
+                            {{ $count }}
+                        </span>
+                        @if ($count > 0)
+                            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800">
+                                есть данные
+                            </span>
                         @endif
-                    </span>
-                </span>
-                @if ($hasContent)
-                    <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800" title="Есть сохранённые записи">
-                        есть данные
-                    </span>
-                @endif
-            </summary>
+                    </div>
+                </div>
+            </header>
 
-            <div class="border-t border-slate-100 px-4 py-4">
+            <div class="px-5 py-5">
                 @if ($artifact['multiple'])
                     @if ($rows->isEmpty())
                         <p class="text-sm text-slate-500">Записей пока нет — добавьте первую ниже.</p>
                     @else
                         <ul class="space-y-4">
                             @foreach ($rows as $element)
-                                <li class="rounded-lg border border-slate-200 bg-slate-50/80 p-4">
+                                <li class="rounded-2xl border border-slate-200 bg-slate-50/90 p-4 shadow-sm">
                                     @include('sa-map.project.partials.element-form', [
                                         'project' => $project,
                                         'level' => $level,
@@ -69,8 +67,8 @@
                         </ul>
                     @endif
 
-                    <div class="mt-4 rounded-lg border border-dashed border-slate-300 bg-white p-4">
-                        <p class="mb-3 text-xs font-medium text-slate-600">Новая запись</p>
+                    <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white p-4 shadow-sm">
+                        <p class="mb-3 text-[10px] font-bold uppercase tracking-wide text-slate-500">Новая запись</p>
                         @include('sa-map.project.partials.element-form', [
                             'project' => $project,
                             'level' => $level,
@@ -82,7 +80,7 @@
                     </div>
                 @else
                     @php $single = $rows->first(); @endphp
-                    <div class="rounded-lg border border-slate-200 bg-white p-4">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                         @include('sa-map.project.partials.element-form', [
                             'project' => $project,
                             'level' => $level,
@@ -94,6 +92,6 @@
                     </div>
                 @endif
             </div>
-        </details>
+        </section>
     @endforeach
 </div>

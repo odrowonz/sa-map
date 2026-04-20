@@ -6,8 +6,8 @@
     <title>@yield('title', config('app.name'))</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-slate-100 antialiased">
-    <header class="border-b border-slate-200 bg-white">
+<body class="flex min-h-screen flex-col bg-slate-100 antialiased">
+    <header class="sticky top-0 z-50 shrink-0 border-b border-slate-200 bg-white shadow-sm">
         <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
             <a href="{{ route('home') }}" class="font-semibold text-slate-800 hover:text-slate-600">Карта СА</a>
             <nav class="flex flex-wrap items-center gap-3 text-sm">
@@ -26,7 +26,7 @@
             </nav>
         </div>
     </header>
-    <main class="mx-auto @yield('main_width', 'max-w-3xl') px-6 py-10">
+    <main class="mx-auto flex w-full min-h-0 flex-1 flex-col px-6 @yield('main_width', 'max-w-3xl') @yield('main_class', 'overflow-y-auto py-10')">
         @if (session('status'))
             <p class="mb-6 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('status') }}</p>
         @endif

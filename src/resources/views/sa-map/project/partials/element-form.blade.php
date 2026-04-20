@@ -37,7 +37,7 @@
             name="body"
             rows="6"
             class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="Текст и списки; файлы и PNG — в блоке «Вложения» ниже (после сохранения записи)."
+            placeholder="Текст и списки. Файлы — в отдельном блоке «Вложения» под этой формой (только у уже сохранённой записи)."
         >{{ is_string($body) ? $body : '' }}</textarea>
     </div>
 
@@ -78,10 +78,8 @@
         </div>
     @endif
 
-    @if (! $isNew && $element)
-        @include('sa-map.project.partials.element-attachments', ['project' => $project, 'element' => $element])
-    @elseif ($isNew)
-        <p class="mt-4 text-sm text-slate-500">После сохранения записи здесь появится загрузка вложений к артефакту.</p>
+    @if ($isNew)
+        <p class="text-sm text-slate-500">Сохраните запись — затем под формой появится блок загрузки файлов к этому артефакту.</p>
     @endif
 
     <div class="flex flex-wrap items-center gap-3 pt-1">
@@ -100,8 +98,13 @@
 
     </form>
 
+{{-- Вложения: отдельные формы, нельзя вкладывать в форму текста (HTML) --}}
 @if (! $isNew && $element)
-    <form method="post" action="{{ route('elements.destroy', [$project, $element]) }}" class="mt-2 inline" onsubmit="return confirm('Удалить эту запись артефакта?');">
+    @include('sa-map.project.partials.element-attachments', ['project' => $project, 'element' => $element])
+@endif
+
+@if (! $isNew && $element)
+    <form method="post" action="{{ route('elements.destroy', [$project, $element]) }}" class="mt-4 inline" onsubmit="return confirm('Удалить эту запись артефакта?');">
         @csrf
         @method('DELETE')
         <button type="submit" class="text-sm text-red-700 underline hover:text-red-900">Удалить запись</button>
