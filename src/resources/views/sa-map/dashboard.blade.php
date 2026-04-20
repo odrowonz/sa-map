@@ -22,8 +22,7 @@
             {{ __('sa.dashboard.nav_projects') }}
         </a>
         <a
-            href="{{ $dash }}#njk"
-            data-cabinet-section="njk"
+            href="{{ route('njk-templates.index') }}"
             class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
         >
             {{ __('sa.dashboard.nav_njk') }}
@@ -159,8 +158,13 @@
                 <p class="mt-2 text-sm leading-relaxed text-slate-600">
                     {!! __('sa.dashboard.njk_lead', ['table' => '<code class="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-xs">sa_njk_templates</code>']) !!}
                 </p>
-                <div class="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-slate-500">
-                    {{ __('sa.dashboard.njk_placeholder') }}
+                <div class="mt-8">
+                    <a
+                        href="{{ route('njk-templates.index') }}"
+                        class="inline-flex rounded-xl bg-slate-800 px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-slate-700"
+                    >
+                        {{ __('sa.dashboard.njk_open') }}
+                    </a>
                 </div>
             </div>
         </section>

@@ -6,6 +6,7 @@ use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ElementController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\NjkTemplateController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectWorkspaceController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,15 @@ $routes = static function () use ($home) {
         Route::get('projects/{project}/attachments/{attachment}/file', [AttachmentController::class, 'file'])->name('attachments.file');
         Route::delete('projects/{project}/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
         Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+        Route::get('njk-templates', [NjkTemplateController::class, 'index'])->name('njk-templates.index');
+        Route::get('njk-templates/create', [NjkTemplateController::class, 'create'])->name('njk-templates.create');
+        Route::post('njk-templates', [NjkTemplateController::class, 'store'])->name('njk-templates.store');
+        Route::get('njk-templates/{njk_template}', [NjkTemplateController::class, 'show'])->name('njk-templates.show');
+        Route::get('njk-templates/{njk_template}/edit', [NjkTemplateController::class, 'edit'])->name('njk-templates.edit');
+        Route::put('njk-templates/{njk_template}', [NjkTemplateController::class, 'update'])->name('njk-templates.update');
+        Route::delete('njk-templates/{njk_template}', [NjkTemplateController::class, 'destroy'])->name('njk-templates.destroy');
+        Route::get('njk-templates/{njk_template}/download', [NjkTemplateController::class, 'download'])->name('njk-templates.download');
     });
 };
 

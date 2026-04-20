@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Project::class, 'user_id');
     }
+
+    public function njkTemplates(): HasMany
+    {
+        return $this->hasMany(NjkTemplate::class, 'user_id');
+    }
 }
