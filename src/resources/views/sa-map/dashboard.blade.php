@@ -1,48 +1,91 @@
-@extends('layouts.app')
+@extends('layouts.sa_workspace')
 
-@section('main_width', 'max-w-6xl')
+@section('workspace_sidebar_heading', 'Разделы')
 
 @section('title', 'Личный кабинет — ' . config('app.name'))
 
-@section('content')
+@section('workspace_sidebar')
     @php($dash = route('dashboard'))
-    <div class="flex flex-col gap-10 lg:flex-row lg:items-start">
-        <nav class="relative z-20 shrink-0 lg:sticky lg:top-24 lg:w-52 lg:self-start" aria-label="Разделы кабинета">
-            <ul class="flex flex-wrap gap-2 border-b border-slate-200 pb-4 lg:flex-col lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6">
-                <li>
-                    <a href="{{ $dash }}#overview" data-cabinet-section="overview" class="cabinet-nav-link block cursor-pointer rounded-md border border-transparent px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">Обзор</a>
-                </li>
-                <li>
-                    <a href="{{ $dash }}#projects" data-cabinet-section="projects" class="cabinet-nav-link block cursor-pointer rounded-md border border-transparent px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">Проекты</a>
-                </li>
-                <li>
-                    <a href="{{ $dash }}#njk" data-cabinet-section="njk" class="cabinet-nav-link block cursor-pointer rounded-md border border-transparent px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">Шаблоны NJK</a>
-                </li>
-                <li>
-                    <a href="{{ $dash }}#profile" data-cabinet-section="profile" class="cabinet-nav-link block cursor-pointer rounded-md border border-transparent px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">Профиль</a>
-                </li>
-            </ul>
-        </nav>
+    <div class="space-y-0.5">
+        <a
+            href="{{ $dash }}#overview"
+            data-cabinet-section="overview"
+            class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
+        >
+            Обзор
+        </a>
+        <a
+            href="{{ $dash }}#projects"
+            data-cabinet-section="projects"
+            class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
+        >
+            Проекты
+        </a>
+        <a
+            href="{{ $dash }}#njk"
+            data-cabinet-section="njk"
+            class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
+        >
+            Шаблоны NJK
+        </a>
+        <a
+            href="{{ $dash }}#profile"
+            data-cabinet-section="profile"
+            class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
+        >
+            Профиль
+        </a>
+    </div>
+@endsection
 
-        <div class="relative z-0 min-w-0 flex-1 space-y-12">
-            <section id="overview" class="scroll-mt-24">
-                <h1 class="text-2xl font-semibold text-slate-800">Личный кабинет</h1>
-                <p class="mt-2 text-slate-600">
-                    Здесь будут проекты карты аналитика (L1–L10), вложения и экспорт по
-                    <a href="{{ route('home') }}" class="text-slate-800 underline">описанию в ТЗ</a>.
+@section('workspace_toolbar')
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="truncate text-lg font-bold uppercase tracking-wide text-slate-800">Личный кабинет</h1>
+            <p class="mt-0.5 text-xs text-slate-500">Проекты карты и настройки</p>
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+            <a
+                href="{{ route('home') }}"
+                class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50"
+            >
+                На главную
+            </a>
+        </div>
+    </div>
+@endsection
+
+@section('workspace_main')
+    <div class="px-4 py-6 sm:px-8 lg:px-10">
+        <section id="overview" class="cabinet-section scroll-mt-6">
+            <header class="mb-6 max-w-4xl">
+                <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-800">
+                    Обзор
+                </span>
+                <h2 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                    Добро пожаловать
+                </h2>
+                <p class="mt-2 text-lg italic text-slate-500">
+                    Карта системного аналитика (L1–L10), вложения и экспорт по ТЗ.
                 </p>
-            </section>
+            </header>
+            <p class="max-w-4xl text-sm leading-relaxed text-slate-600">
+                Подробности — на <a href="{{ route('home') }}" class="font-medium text-blue-600 hover:text-blue-800">главной странице</a> и в документации ТЗ.
+            </p>
+        </section>
 
-            <section id="projects" class="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-semibold text-slate-800">Проекты</h2>
+        <section id="projects" class="cabinet-section mt-14 scroll-mt-6">
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">Проекты</span>
+                <h2 class="mt-4 text-xl font-bold text-slate-900">Ваши проекты</h2>
                 <p class="mt-2 text-sm text-slate-600">
-                    Задачи и проекты системного анализа (данные в <code class="rounded bg-slate-100 px-1 text-xs">sa_projects</code>).
+                    Данные в <code class="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-xs">sa_projects</code>.
                 </p>
 
-                <form method="post" action="{{ route('projects.store') }}" class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">
+                <form method="post" action="{{ route('projects.store') }}" class="mt-8 flex flex-col gap-4 border-t border-slate-100 pt-6 sm:flex-row sm:items-end">
                     @csrf
                     <div class="min-w-0 flex-1">
-                        <label for="project-name" class="block text-sm font-medium text-slate-700">Название проекта</label>
+                        <label for="project-name" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Название проекта</label>
                         <input
                             id="project-name"
                             name="name"
@@ -50,103 +93,143 @@
                             value="{{ old('name') }}"
                             required
                             maxlength="500"
-                            class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                            class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
                             placeholder="Например: Карта для сервиса переводов"
                         />
                         @error('name')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
-                    <button type="submit" class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                    <button type="submit" class="shrink-0 rounded-xl bg-slate-800 px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-slate-700">
                         Создать проект
                     </button>
                 </form>
 
                 @if ($projects->isEmpty())
-                    <div class="mt-6 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+                    <div class="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-slate-500">
                         Проектов пока нет — добавьте первый выше.
                     </div>
                 @else
-                    <ul class="mt-6 divide-y divide-slate-200 rounded-lg border border-slate-200">
+                    <ul class="mt-8 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-slate-50/50">
                         @foreach ($projects as $project)
-                            <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                            <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5">
                                 <div class="min-w-0">
-                                    <p class="font-medium text-slate-800">{{ $project->name }}</p>
-                                    <p class="text-xs text-slate-500">
+                                    <p class="font-semibold text-slate-900">{{ $project->name }}</p>
+                                    <p class="mt-0.5 text-xs text-slate-500">
                                         Обновлён {{ $project->updated_at->translatedFormat('d.m.Y H:i') }}
                                         @if ($project->slug)
-                                            · <span class="font-mono">{{ $project->slug }}</span>
+                                            · <span class="font-mono text-slate-600">{{ $project->slug }}</span>
                                         @endif
                                     </p>
                                 </div>
-                                <div class="flex shrink-0 flex-wrap items-center gap-4">
-                                    <a href="{{ route('projects.show', $project) }}" class="text-sm font-medium text-slate-800 underline hover:text-slate-600">Открыть карту</a>
-                                    <form method="post" action="{{ route('projects.destroy', $project) }}" class="inline" onsubmit="return confirm('Удалить этот проект? Связанные элементы карты будут удалены.');">
+                                <div class="flex shrink-0 flex-wrap items-center gap-3">
+                                    <a
+                                        href="{{ route('projects.show', $project) }}"
+                                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-sm hover:bg-blue-700"
+                                    >
+                                        Открыть карту
+                                    </a>
+                                    <form
+                                        method="post"
+                                        action="{{ route('projects.destroy', $project) }}"
+                                        class="inline"
+                                        onsubmit="return confirm('Удалить этот проект? Связанные элементы карты будут удалены.');"
+                                    >
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-sm text-red-700 underline hover:text-red-900">Удалить</button>
+                                        <button type="submit" class="text-xs font-semibold text-red-600 underline hover:text-red-800">
+                                            Удалить
+                                        </button>
                                     </form>
                                 </div>
                             </li>
                         @endforeach
                     </ul>
                 @endif
-            </section>
+            </div>
+        </section>
 
-            <section id="njk" class="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-semibold text-slate-800">Библиотека шаблонов NJK</h2>
-                <p class="mt-2 text-sm text-slate-600">
-                    Шаблоны Nunjucks для экспорта в Markdown — по ТЗ, п. 5.5. Появится после реализации проектов.
+        <section id="njk" class="cabinet-section mt-14 scroll-mt-6">
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">NJK</span>
+                <h2 class="mt-4 text-xl font-bold text-slate-900">Библиотека шаблонов NJK</h2>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                    Шаблоны Nunjucks для экспорта в Markdown — п. 5.5 ТЗ. Хранение в <code class="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-xs">sa_njk_templates</code>.
                 </p>
-                <div class="mt-6 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
-                    Шаблоны хранятся в <code class="rounded bg-slate-200 px-1 text-xs">sa_njk_templates</code>.
+                <div class="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-slate-500">
+                    Раздел в разработке.
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section id="profile" class="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 class="text-lg font-semibold text-slate-800">Профиль</h2>
-                <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                    <div>
-                        <dt class="text-slate-500">Email</dt>
-                        <dd class="font-medium text-slate-800">{{ $user->email }}</dd>
+        <section id="profile" class="cabinet-section mt-14 scroll-mt-6 pb-8">
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">Профиль</span>
+                <h2 class="mt-4 text-xl font-bold text-slate-900">Аккаунт</h2>
+                <dl class="mt-6 grid gap-6 text-sm sm:grid-cols-2">
+                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
+                        <dt class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Email</dt>
+                        <dd class="mt-1 font-semibold text-slate-900">{{ $user->email }}</dd>
                     </div>
-                    <div>
-                        <dt class="text-slate-500">Имя</dt>
-                        <dd class="font-medium text-slate-800">{{ $user->name ?: '—' }}</dd>
+                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
+                        <dt class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Имя</dt>
+                        <dd class="mt-1 font-semibold text-slate-900">{{ $user->name ?: '—' }}</dd>
                     </div>
-                    <div>
-                        <dt class="text-slate-500">Язык интерфейса</dt>
-                        <dd class="font-medium text-slate-800">{{ $user->locale }} <span class="text-slate-400">(переключатель — позже)</span></dd>
+                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 sm:col-span-2">
+                        <dt class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Язык интерфейса</dt>
+                        <dd class="mt-1 font-semibold text-slate-900">{{ $user->locale }} <span class="text-slate-400">(переключатель — позже)</span></dd>
                     </div>
                 </dl>
-            </section>
-        </div>
+            </div>
+        </section>
     </div>
+@endsection
+
+@push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var nav = document.querySelector('[aria-label="Разделы кабинета"]');
-            if (!nav) return;
-            var links = nav.querySelectorAll('a[data-cabinet-section]');
+            var links = document.querySelectorAll('a[data-cabinet-section]');
+            var scrollRoot = document.getElementById('workspace-main-scroll');
+
             function hashKey() {
                 var h = window.location.hash;
                 if (!h || h === '#') return 'overview';
                 return h.replace(/^#/, '');
             }
+
             function paint() {
                 var key = hashKey();
                 links.forEach(function (a) {
                     var on = a.getAttribute('data-cabinet-section') === key;
-                    a.classList.toggle('bg-slate-200/80', on);
-                    a.classList.toggle('font-medium', on);
-                    a.classList.toggle('text-slate-800', on);
-                    a.classList.toggle('text-slate-600', !on);
-                    a.classList.toggle('border-slate-200/80', on);
-                    if (on) a.setAttribute('aria-current', 'true');
-                    else a.removeAttribute('aria-current');
+                    a.classList.toggle('border-blue-500', on);
+                    a.classList.toggle('bg-slate-700', on);
+                    a.classList.toggle('text-white', on);
+                    a.classList.toggle('shadow-lg', on);
+                    a.classList.toggle('border-transparent', !on);
+                    a.classList.toggle('text-slate-300', !on);
+                    if (on) {
+                        a.setAttribute('aria-current', 'true');
+                    } else {
+                        a.removeAttribute('aria-current');
+                    }
                 });
             }
+
             window.addEventListener('hashchange', paint);
             paint();
+
+            links.forEach(function (a) {
+                a.addEventListener('click', function () {
+                    requestAnimationFrame(function () {
+                        var id = a.getAttribute('href');
+                        if (!id || id.indexOf('#') === -1) return;
+                        var el = document.getElementById(id.slice(1));
+                        if (el && scrollRoot) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    });
+                });
+            });
         });
     </script>
-@endsection
+@endpush

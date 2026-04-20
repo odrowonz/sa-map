@@ -28,14 +28,14 @@
                 @endauth
             </div>
             <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <p class="shrink-0 px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Типы артефактов</p>
+                <p class="shrink-0 px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">@yield('workspace_sidebar_heading', 'Типы артефактов')</p>
                 <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2">
                     @yield('workspace_sidebar')
                 </div>
             </div>
             @auth
                 <div class="shrink-0 space-y-2 border-t border-slate-700 p-3 text-xs">
-                    <a href="{{ route('dashboard') }}" class="block font-medium text-slate-400 hover:text-white">Личный кабинет</a>
+                    <a href="{{ route('dashboard') }}" class="block font-medium hover:text-white {{ request()->routeIs('dashboard') ? 'text-white' : 'text-slate-400' }}">Личный кабинет</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="text-slate-500 hover:text-red-300">Выйти</button>
@@ -51,10 +51,12 @@
                 @yield('workspace_toolbar')
             </header>
 
-            {{-- Панель 3: L1–L10 --}}
-            <div class="shrink-0 border-b border-slate-200 bg-white shadow-sm">
-                @yield('workspace_level_tabs')
-            </div>
+            @hasSection('workspace_level_tabs')
+                {{-- Панель 3: L1–L10 (только экран проекта) --}}
+                <div class="shrink-0 border-b border-slate-200 bg-white shadow-sm">
+                    @yield('workspace_level_tabs')
+                </div>
+            @endif
 
             {{-- Панель 4: прокрутка, основной контент --}}
             <main id="workspace-main-scroll" class="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-slate-50" tabindex="-1">
