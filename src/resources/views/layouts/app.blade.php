@@ -11,7 +11,6 @@
         <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
             <a href="{{ route('home') }}" class="font-semibold text-slate-800 hover:text-slate-600">{{ __('sa.nav.map_sa') }}</a>
             <nav class="flex flex-wrap items-center gap-3 text-sm">
-                @include('partials.locale-switcher')
                 @auth
                     <a href="{{ route('dashboard') }}" class="font-medium text-slate-800 hover:text-slate-600">{{ __('sa.nav.dashboard') }}</a>
                     <span class="hidden text-slate-400 sm:inline">|</span>

@@ -15,7 +15,6 @@
             <p class="mt-0.5 font-mono text-xs text-slate-500">{{ $template->filename }}</p>
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-2">
-            @include('partials.locale-switcher')
             <a
                 href="{{ route('njk-templates.index') }}"
                 class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50"

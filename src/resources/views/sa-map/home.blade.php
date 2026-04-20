@@ -43,7 +43,6 @@
             <p class="mt-0.5 text-xs text-slate-500">{{ __('sa.home.toolbar_sub') }}</p>
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-2">
-            @include('partials.locale-switcher')
             @auth
                 <a
                     href="{{ route('dashboard') }}"

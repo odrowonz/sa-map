@@ -68,15 +68,39 @@
             </p>
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-2">
-            @include('partials.locale-switcher')
-            <button
-                type="button"
-                disabled
-                class="cursor-not-allowed rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400"
-                title="{{ __('sa.workspace.json_title') }}"
+            <form method="post" action="{{ route('projects.export-data', $project) }}" class="inline">
+                @csrf
+                <button
+                    type="submit"
+                    class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50"
+                    title="{{ __('sa.project_data.export_title') }}"
+                >
+                    {{ __('sa.project_data.export') }}
+                </button>
+            </form>
+            <form
+                method="post"
+                action="{{ route('projects.import-data', $project) }}"
+                enctype="multipart/form-data"
+                class="inline-flex flex-wrap items-center gap-2"
+                data-confirm="{{ __('sa.project_data.import_confirm') }}"
+                onsubmit="return confirm(this.dataset.confirm);"
             >
-                {{ __('sa.workspace.json_export') }}
-            </button>
+                @csrf
+                <label class="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50">
+                    <span>{{ __('sa.project_data.import_pick') }}</span>
+                    <input type="file" name="archive" accept=".zip,application/zip" class="hidden" required onchange="var b=this.form.querySelector('[data-import-submit]'); if(b) b.removeAttribute('disabled');" />
+                </label>
+                <button
+                    type="submit"
+                    data-import-submit
+                    disabled
+                    class="rounded-lg border border-slate-800 bg-slate-800 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    title="{{ __('sa.project_data.import_title') }}"
+                >
+                    {{ __('sa.project_data.import') }}
+                </button>
+            </form>
         </div>
     </div>
 @endsection

@@ -37,6 +37,7 @@ return [
     ],
 
     'auth' => [
+        'toolbar_sub' => 'Access your account and projects',
         'login_title' => 'Log in',
         'register_title' => 'Register',
         'email' => 'Email',
@@ -201,6 +202,18 @@ return [
         'flash_created' => 'Template saved.',
         'flash_updated' => 'Template updated.',
         'flash_deleted' => 'Template deleted.',
+    ],
+
+    'project_data' => [
+        'export' => 'Export data',
+        'export_title' => 'Download ZIP: JSON and attachments for rows marked “Include in exports”',
+        'import' => 'Import data',
+        'import_pick' => 'ZIP file',
+        'import_title' => 'Upload archive (JSON + files) into this project',
+        'import_confirm' => 'Import data from the selected ZIP into this project? Matching short titles will replace the whole row.',
+        'imported' => 'Imported rows: :count.',
+        'import_failed' => 'Could not read the archive.',
+        'import_error' => 'Import error:',
     ],
 
     'generic' => [

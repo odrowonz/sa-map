@@ -5,7 +5,9 @@
 @section('title', __('sa.dashboard.page_title').' — '.config('app.name'))
 
 @section('workspace_sidebar')
-    @php($dash = route('dashboard'))
+    @php
+        $dash = route('dashboard');
+    @endphp
     <div class="space-y-0.5">
         <a
             href="{{ $dash }}#overview"
@@ -44,7 +46,6 @@
             <p class="mt-0.5 text-xs text-slate-500">{{ __('sa.dashboard.toolbar_sub') }}</p>
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-2">
-            @include('partials.locale-switcher')
             <a
                 href="{{ route('home') }}"
                 class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50"
@@ -169,6 +170,14 @@
             </div>
         </section>
 
+        @php
+            $localeUiShort = match ($user->locale ?? 'ru') {
+                'kk' => 'ҚАЗ',
+                'ru' => 'РУС',
+                'en' => 'ENG',
+                default => strtoupper(substr((string) ($user->locale ?? 'ru'), 0, 3)),
+            };
+        @endphp
         <section id="profile" class="cabinet-section mt-14 scroll-mt-6 pb-8">
             <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
                 <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.dashboard.profile_badge') }}</span>
@@ -184,7 +193,7 @@
                     </div>
                     <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 sm:col-span-2">
                         <dt class="text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_locale') }}</dt>
-                        <dd class="mt-1 font-semibold text-slate-900">{{ $user->locale }} <span class="text-slate-400">{{ __('sa.dashboard.profile_locale_note') }}</span></dd>
+                        <dd class="mt-1 text-lg font-bold tracking-wide text-slate-900">{{ $localeUiShort }}</dd>
                     </div>
                 </dl>
             </div>

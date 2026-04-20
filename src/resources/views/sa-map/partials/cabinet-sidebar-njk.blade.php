@@ -1,4 +1,6 @@
-@php($dash = route('dashboard'))
+@php
+    $dash = route('dashboard');
+@endphp
 <div class="space-y-0.5">
     <a
         href="{{ $dash }}#overview"
