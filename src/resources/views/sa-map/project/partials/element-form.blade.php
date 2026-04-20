@@ -21,7 +21,7 @@
 @endif
 
     <div>
-        <label class="block text-sm font-medium text-slate-700">Краткое название / заголовок</label>
+        <label class="block text-sm font-medium text-slate-700">{{ __('sa.element.title_label') }}</label>
         <input
             type="text"
             name="title"
@@ -32,12 +32,12 @@
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-slate-700">Содержимое</label>
+        <label class="block text-sm font-medium text-slate-700">{{ __('sa.element.body_label') }}</label>
         <textarea
             name="body"
             rows="6"
             class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-            placeholder="Текст и списки. Файлы — в отдельном блоке «Вложения» под этой формой (только у уже сохранённой записи)."
+            placeholder="{{ __('sa.element.body_placeholder') }}"
         >{{ is_string($body) ? $body : '' }}</textarea>
     </div>
 
@@ -51,15 +51,15 @@
                 class="rounded border-slate-300 text-slate-800 focus:ring-slate-500"
                 @checked(filter_var($include, FILTER_VALIDATE_BOOLEAN))
             />
-            Включать в выгрузки (Сохранить данные / MD)
+            {{ __('sa.element.include_export') }}
         </label>
     </div>
 
     @if ($level > 1)
         <div>
-            <label class="block text-sm font-medium text-slate-700">Основание на L{{ $level - 1 }} (трассировка)</label>
+            <label class="block text-sm font-medium text-slate-700">{{ __('sa.element.upstream_label', ['prev' => $level - 1]) }}</label>
             @if ($upstreamElements->isEmpty())
-                <p class="mt-1 text-sm text-amber-800">На уровне L{{ $level - 1 }} пока нет элементов — сначала заполните предыдущий уровень.</p>
+                <p class="mt-1 text-sm text-amber-800">{{ __('sa.element.upstream_empty', ['prev' => $level - 1]) }}</p>
             @else
                 <select
                     name="upstream_element_ids[]"
@@ -73,25 +73,25 @@
                         </option>
                     @endforeach
                 </select>
-                <p class="mt-1 text-xs text-slate-500">Ctrl+клик для нескольких значений.</p>
+                <p class="mt-1 text-xs text-slate-500">{{ __('sa.element.upstream_hint') }}</p>
             @endif
         </div>
     @endif
 
     @if ($isNew)
-        <p class="text-sm text-slate-500">Сохраните запись — затем под формой появится блок загрузки файлов к этому артефакту.</p>
+        <p class="text-sm text-slate-500">{{ __('sa.element.save_then_attachments') }}</p>
     @endif
 
     <div class="flex flex-wrap items-center gap-3 pt-1">
         <button type="submit" class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
             @if ($isNew)
                 @if ($artifact['multiple'])
-                    Добавить запись
+                    {{ __('sa.element.add_record') }}
                 @else
-                    Сохранить
+                    {{ __('sa.element.save') }}
                 @endif
             @else
-                Сохранить изменения
+                {{ __('sa.element.save_changes') }}
             @endif
         </button>
     </div>
@@ -104,9 +104,9 @@
 @endif
 
 @if (! $isNew && $element)
-    <form method="post" action="{{ route('elements.destroy', [$project, $element]) }}" class="mt-4 inline" onsubmit="return confirm('Удалить эту запись артефакта?');">
+    <form method="post" action="{{ route('elements.destroy', [$project, $element]) }}" class="mt-4 inline" data-confirm="{{ __('sa.element.delete_record_confirm') }}" onsubmit="return confirm(this.dataset.confirm);">
         @csrf
         @method('DELETE')
-        <button type="submit" class="text-sm text-red-700 underline hover:text-red-900">Удалить запись</button>
+        <button type="submit" class="text-sm text-red-700 underline hover:text-red-900">{{ __('sa.element.delete_record') }}</button>
     </form>
 @endif

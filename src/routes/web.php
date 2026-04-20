@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ElementController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectWorkspaceController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,8 @@ $prefix = trim((string) parse_url(config('app.url'), PHP_URL_PATH), '/');
 
 $routes = static function () use ($home) {
     Route::get('/', $home)->name('home');
+
+    Route::post('locale', [LocaleController::class, 'update'])->name('locale.update');
 
     Route::middleware('guest')->group(function () {
         Route::get('login', [LoginController::class, 'create'])->name('login');

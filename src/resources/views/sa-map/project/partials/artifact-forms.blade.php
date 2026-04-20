@@ -27,19 +27,19 @@
                         <h2 class="mt-1 text-base font-bold text-slate-900">{{ $artifact['label'] }}</h2>
                         <p class="mt-0.5 text-xs text-slate-500">
                             @if ($artifact['multiple'])
-                                Несколько записей
+                                {{ __('sa.artifact.multiple') }}
                             @else
-                                Одна запись
+                                {{ __('sa.artifact.single') }}
                             @endif
                         </p>
                     </div>
                     <div class="flex shrink-0 flex-wrap items-center gap-2">
-                        <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 tabular-nums" title="Количество записей по этому типу">
+                        <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 tabular-nums" title="{{ __('sa.artifact.count') }}">
                             {{ $count }}
                         </span>
                         @if ($count > 0)
                             <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800">
-                                есть данные
+                                {{ __('sa.artifact.has_data') }}
                             </span>
                         @endif
                     </div>
@@ -49,7 +49,7 @@
             <div class="px-5 py-5">
                 @if ($artifact['multiple'])
                     @if ($rows->isEmpty())
-                        <p class="text-sm text-slate-500">Записей пока нет — добавьте первую ниже.</p>
+                        <p class="text-sm text-slate-500">{{ __('sa.artifact.empty') }}</p>
                     @else
                         <ul class="space-y-4">
                             @foreach ($rows as $element)
@@ -68,7 +68,7 @@
                     @endif
 
                     <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white p-4 shadow-sm">
-                        <p class="mb-3 text-[10px] font-bold uppercase tracking-wide text-slate-500">Новая запись</p>
+                        <p class="mb-3 text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.artifact.new_entry') }}</p>
                         @include('sa-map.project.partials.element-form', [
                             'project' => $project,
                             'level' => $level,

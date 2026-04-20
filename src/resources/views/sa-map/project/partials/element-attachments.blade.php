@@ -1,10 +1,10 @@
 <div class="mt-6 border-t border-slate-200 pt-4">
-    <h4 class="text-sm font-medium text-slate-800">Вложения (файлы, PNG, схемы)</h4>
+    <h4 class="text-sm font-medium text-slate-800">{{ __('sa.attachments.title') }}</h4>
     <div class="mt-2 rounded-md border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
-        <strong>Как пользоваться:</strong> выберите файл → нажмите <strong>«Загрузить»</strong> — файл сразу сохраняется и появится в списке ниже. Кнопку «Сохранить изменения» в форме выше для файлов нажимать <strong>не нужно</strong> (она только для текста, галочки и трассировки).
+        <strong>{{ __('sa.attachments.howto') }}</strong> {!! __('sa.attachments.howto_body') !!}
     </div>
     <p class="mt-2 text-xs text-slate-500">
-        К <strong>одной записи</strong> артефакта можно прикрепить <strong>несколько файлов</strong> — каждый «Загрузить» добавляет ещё одну строку в списке. Хранение в <code class="rounded bg-slate-100 px-1">sa_attachments</code>.
+        {!! __('sa.attachments.hint', ['table' => '<code class="rounded bg-slate-100 px-1">sa_attachments</code>']) !!}
     </p>
 
     @if ($element->attachments->isNotEmpty())
@@ -12,7 +12,7 @@
             @foreach ($element->attachments as $att)
                 <li class="rounded-lg border border-slate-200 bg-slate-50/90 p-3">
                     <div class="flex gap-3">
-                        <span class="mt-0.5 shrink-0 text-slate-500" title="Вложение">
+                        <span class="mt-0.5 shrink-0 text-slate-500" title="{{ __('sa.attachments.attachment_title') }}">
                             {{-- иконка «прищепка» --}}
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.845-8.25 8.25a4.5 4.5 0 0 1-6.364-6.364l8.25-8.25a3 3 0 1 1 4.243 4.243l-8.25 8.25a1.5 1.5 0 0 1-2.122-2.122l8.25-8.25" />
@@ -41,18 +41,19 @@
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
-                                        Открыть
+                                        {{ __('sa.attachments.open') }}
                                     </a>
                                     <form
                                         method="post"
                                         action="{{ route('attachments.destroy', [$project, $att]) }}"
                                         class="inline"
-                                        onsubmit="return confirm('Удалить этот файл?');"
+                                        data-confirm="{{ __('sa.attachments.delete_confirm') }}"
+                                        onsubmit="return confirm(this.dataset.confirm);"
                                     >
                                         @csrf
                                         @method('DELETE')
                                         <input type="hidden" name="element" value="{{ $element->id }}" />
-                                        <button type="submit" class="text-sm text-red-700 underline hover:text-red-900">Удалить</button>
+                                        <button type="submit" class="text-sm text-red-700 underline hover:text-red-900">{{ __('sa.attachments.delete') }}</button>
                                     </form>
                                 </div>
                             </div>
@@ -61,18 +62,18 @@
                                 $icon = \App\Support\AttachmentFileIcon::forAttachment($att);
                             @endphp
                             @if ($icon['mode'] === 'image')
-                                <p class="mt-3 text-xs font-medium text-slate-600">Предпросмотр</p>
+                                <p class="mt-3 text-xs font-medium text-slate-600">{{ __('sa.attachments.preview') }}</p>
                                 <div class="mt-1 overflow-hidden rounded-md border border-slate-200 bg-white">
                                     <img
                                         src="{{ route('attachments.file', [$project, $att]) }}"
-                                        alt="Предпросмотр: {{ $att->original_name }}"
+                                        alt="{{ __('sa.attachments.preview_alt', ['name' => $att->original_name]) }}"
                                         class="max-h-64 w-full max-w-lg object-contain"
                                         loading="lazy"
                                     />
                                 </div>
                             @elseif ($icon['mode'] === 'brand')
                                 <div class="mt-3 rounded-md border border-slate-200 bg-white p-3">
-                                    <p class="text-xs font-medium text-slate-600">Тип / инструмент</p>
+                                    <p class="text-xs font-medium text-slate-600">{{ __('sa.attachments.type_tool') }}</p>
                                     <div class="mt-2 flex items-start gap-3">
                                         <div class="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
                                             <img
@@ -95,7 +96,7 @@
                                         <div class="min-w-0 text-sm text-slate-700">
                                             <p class="font-medium text-slate-800">{{ $icon['label'] }}</p>
                                             <p class="mt-1 text-xs text-slate-500">
-                                                Просмотр содержимого — кнопка «Открыть». Иконки: <a href="https://github.com/vscode-icons/vscode-icons" class="underline" target="_blank" rel="noopener noreferrer">vscode-icons</a> (jsDelivr, MIT).
+                                                {!! __('sa.attachments.brand_hint', ['url' => 'https://github.com/vscode-icons/vscode-icons']) !!}
                                             </p>
                                         </div>
                                     </div>
@@ -108,9 +109,9 @@
                                         </svg>
                                     </span>
                                     <div>
-                                        <p class="text-xs font-medium text-slate-600">Без фирменной иконки</p>
+                                        <p class="text-xs font-medium text-slate-600">{{ __('sa.attachments.no_brand') }}</p>
                                         <p class="mt-1 text-sm text-slate-700">{{ $icon['label'] }}</p>
-                                        <p class="mt-1 text-xs text-slate-500">Откройте файл кнопкой «Открыть». При необходимости расширение можно добавить в конфиг <code class="rounded bg-slate-100 px-1 text-xs">config/sa_map/attachment_file_icons.php</code>.</p>
+                                        <p class="mt-1 text-xs text-slate-500">{!! __('sa.attachments.no_brand_hint', ['path' => '<code class="rounded bg-slate-100 px-1 text-xs">config/sa_map/attachment_file_icons.php</code>']) !!}</p>
                                     </div>
                                 </div>
                             @endif
@@ -120,7 +121,7 @@
             @endforeach
         </ul>
     @else
-        <p class="mt-2 text-sm text-slate-500">Файлов пока нет.</p>
+        <p class="mt-2 text-sm text-slate-500">{{ __('sa.attachments.none') }}</p>
     @endif
 
     <form
@@ -136,7 +137,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-slate-500" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.845-8.25 8.25a4.5 4.5 0 0 1-6.364-6.364l8.25-8.25a3 3 0 1 1 4.243 4.243l-8.25 8.25a1.5 1.5 0 0 1-2.122-2.122l8.25-8.25" />
                     </svg>
-                    Добавить ещё файл
+                    {{ __('sa.attachments.add_file') }}
                 </span>
             </label>
             <input
@@ -146,10 +147,10 @@
                 required
                 class="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-800 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-slate-700"
             />
-            <p class="mt-1 text-xs text-slate-500">До 20 МБ за один раз. Можно загрузить несколько раз подряд.</p>
+            <p class="mt-1 text-xs text-slate-500">{{ __('sa.attachments.upload_hint') }}</p>
         </div>
         <button type="submit" class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
-            Загрузить
+            {{ __('sa.attachments.upload') }}
         </button>
     </form>
 </div>

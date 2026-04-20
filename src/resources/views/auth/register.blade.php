@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Регистрация — ' . config('app.name'))
+@section('title', __('sa.auth.register_title').' — '.config('app.name'))
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-slate-800">Регистрация</h1>
+    <h1 class="text-2xl font-semibold text-slate-800">{{ __('sa.auth.register_title') }}</h1>
     <form method="POST" action="{{ route('register') }}" class="mt-8 space-y-6">
         @csrf
         <div>
-            <label for="name" class="block text-sm font-medium text-slate-700">Имя (необязательно)</label>
+            <label for="name" class="block text-sm font-medium text-slate-700">{{ __('sa.auth.name_optional') }}</label>
             <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name"
                 class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500">
             @error('name')
@@ -15,7 +15,7 @@
             @enderror
         </div>
         <div>
-            <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
+            <label for="email" class="block text-sm font-medium text-slate-700">{{ __('sa.auth.email') }}</label>
             <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="username"
                 class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500">
             @error('email')
@@ -23,7 +23,7 @@
             @enderror
         </div>
         <div>
-            <label for="password" class="block text-sm font-medium text-slate-700">Пароль</label>
+            <label for="password" class="block text-sm font-medium text-slate-700">{{ __('sa.auth.password') }}</label>
             <input id="password" name="password" type="password" required autocomplete="new-password"
                 class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500">
             @error('password')
@@ -31,15 +31,15 @@
             @enderror
         </div>
         <div>
-            <label for="password_confirmation" class="block text-sm font-medium text-slate-700">Пароль ещё раз</label>
+            <label for="password_confirmation" class="block text-sm font-medium text-slate-700">{{ __('sa.auth.password_confirm') }}</label>
             <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password"
                 class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500">
         </div>
         <button type="submit" class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
-            Зарегистрироваться
+            {{ __('sa.auth.submit_register') }}
         </button>
     </form>
     <p class="mt-8 text-sm text-slate-600">
-        Уже есть аккаунт? <a href="{{ route('login') }}" class="font-medium text-slate-800 underline">Вход</a>
+        {{ __('sa.auth.has_account') }} <a href="{{ route('login') }}" class="font-medium text-slate-800 underline">{{ __('sa.auth.login_title') }}</a>
     </p>
 @endsection

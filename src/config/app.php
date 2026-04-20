@@ -101,9 +101,16 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'ru'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supported UI locales (sa.* translations exist for each)
+    |--------------------------------------------------------------------------
+    */
+    'available_locales' => ['ru', 'en', 'kk'],
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 

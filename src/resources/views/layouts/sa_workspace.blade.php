@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="ltr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,27 +18,36 @@
         {{-- Панель 1: фиксирована слева, высота рабочей области --}}
         <aside class="flex w-full shrink-0 flex-col border-b border-slate-700 bg-slate-800 text-slate-300 lg:h-full lg:w-72 lg:min-h-0 lg:border-r lg:border-b-0">
             <div class="shrink-0 border-b border-slate-700 p-4">
-                <a href="{{ route('home') }}" class="text-lg font-bold tracking-tight text-white hover:text-blue-300">Карта СА</a>
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                    <a href="{{ route('home') }}" class="text-lg font-bold tracking-tight text-white hover:text-blue-300">{{ __('sa.nav.map_sa') }}</a>
+                    @include('partials.locale-switcher', ['variant' => 'dark'])
+                </div>
                 @auth
                     <p class="mt-2 truncate text-xs text-slate-400" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</p>
                 @else
                     <p class="mt-2 text-xs">
-                        <a href="{{ route('login') }}" class="text-blue-400 hover:text-blue-300 hover:underline">Вход</a>
+                        <a href="{{ route('login') }}" class="text-blue-400 hover:text-blue-300 hover:underline">{{ __('sa.nav.login') }}</a>
                     </p>
                 @endauth
             </div>
             <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <p class="shrink-0 px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">@yield('workspace_sidebar_heading', 'Типы артефактов')</p>
+                <p class="shrink-0 px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    @hasSection('workspace_sidebar_heading')
+                        @yield('workspace_sidebar_heading')
+                    @else
+                        {{ __('sa.workspace.sidebar_artifact_types') }}
+                    @endif
+                </p>
                 <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2">
                     @yield('workspace_sidebar')
                 </div>
             </div>
             @auth
                 <div class="shrink-0 space-y-2 border-t border-slate-700 p-3 text-xs">
-                    <a href="{{ route('dashboard') }}" class="block font-medium hover:text-white {{ request()->routeIs('dashboard') ? 'text-white' : 'text-slate-400' }}">Личный кабинет</a>
+                    <a href="{{ route('dashboard') }}" class="block font-medium hover:text-white {{ request()->routeIs('dashboard') ? 'text-white' : 'text-slate-400' }}">{{ __('sa.nav.dashboard') }}</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="text-slate-500 hover:text-red-300">Выйти</button>
+                        <button type="submit" class="text-slate-500 hover:text-red-300">{{ __('sa.nav.logout') }}</button>
                     </form>
                 </div>
             @endauth

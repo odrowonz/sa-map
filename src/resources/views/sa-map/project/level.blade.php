@@ -18,6 +18,7 @@
     $totalElementsUi = (int) collect($artifactsForUi)->sum('elementCount');
     $totalElementsDisplay = (int) collect($artifactsForDisplay)->sum('elementCount');
     $isArtifactFiltered = $artifactFilter !== null;
+    $recordsWordDisplay = $totalElementsDisplay === 1 ? __('sa.level.record_one') : __('sa.level.records_many');
 @endphp
 
 @section('title')
@@ -50,7 +51,7 @@
     </div>
     <div class="mt-4 border-t border-slate-700 pt-3">
         <a href="{{ route('projects.level', [$project, $level]) }}" class="text-xs font-semibold text-blue-400 hover:text-blue-300">
-            Все типы сразу
+            {{ __('sa.workspace.all_types') }}
         </a>
     </div>
 @endsection
@@ -60,27 +61,28 @@
         <div class="min-w-0">
             <h1 class="truncate text-lg font-bold uppercase tracking-wide text-slate-800">{{ $project->name }}</h1>
             <p class="mt-0.5 text-xs text-slate-500">
-                Обновлён {{ $project->updated_at->translatedFormat('d.m.Y H:i') }}
+                {{ __('sa.dashboard.updated') }} {{ $project->updated_at->translatedFormat('d.m.Y H:i') }}
                 @if ($project->slug)
                     · <span class="font-mono text-slate-600">{{ $project->slug }}</span>
                 @endif
             </p>
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-2">
+            @include('partials.locale-switcher')
             <button
                 type="button"
                 disabled
                 class="cursor-not-allowed rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400"
-                title="Выгрузка JSON — в разработке"
+                title="{{ __('sa.workspace.json_title') }}"
             >
-                JSON
+                {{ __('sa.workspace.json_export') }}
             </button>
         </div>
     </div>
 @endsection
 
 @section('workspace_level_tabs')
-    <div class="flex overflow-x-auto" role="tablist" aria-label="Уровни карты L1–L10">
+    <div class="flex overflow-x-auto" role="tablist" aria-label="{{ __('sa.level.tablist_aria') }}">
         @foreach (range(1, 10) as $n)
             <a
                 href="{{ route('projects.level', [$project, $n]) }}"
@@ -105,14 +107,14 @@
         @if ($isArtifactFiltered)
             <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
                 <p class="min-w-0">
-                    Показан только тип <strong>{{ $artifactFilterLabel }}</strong>
-                    · <span class="tabular-nums">{{ $totalElementsDisplay }}</span> {{ $totalElementsDisplay === 1 ? 'запись' : 'записей' }}
+                    {!! __('sa.level.filtered_banner', ['name' => e($artifactFilterLabel)]) !!}
+                    · <span class="tabular-nums">{{ $totalElementsDisplay }}</span> {{ $recordsWordDisplay }}
                 </p>
                 <a
                     href="{{ route('projects.level', [$project, $level]) }}"
                     class="shrink-0 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50"
                 >
-                    Все типы уровня
+                    {{ __('sa.level.all_types_level') }}
                 </a>
             </div>
         @endif
@@ -120,29 +122,29 @@
         <div class="mb-8 flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-end sm:justify-between">
             @unless ($isArtifactFiltered)
                 <div class="min-w-0 flex-1 max-w-md">
-                    <label for="artifact-filter" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Фильтр по типу</label>
+                    <label for="artifact-filter" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.level.filter_label') }}</label>
                     <input
                         id="artifact-filter"
                         type="search"
                         name="artifact_filter"
                         autocomplete="off"
-                        placeholder="Ключ или название…"
+                        placeholder="{{ __('sa.level.filter_placeholder') }}"
                         class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
                     />
                 </div>
             @endunless
             <p class="text-xs leading-relaxed text-slate-600 sm:text-right {{ $isArtifactFiltered ? 'sm:text-left' : '' }}" id="artifact-level-summary">
                 @if ($isArtifactFiltered)
-                    <span class="font-bold uppercase tracking-wide text-slate-400">На уровне всего</span>
+                    <span class="font-bold uppercase tracking-wide text-slate-400">{{ __('sa.level.summary_total') }}</span>
                     <span class="mt-1 block sm:mt-0 sm:inline">
-                        <strong class="text-slate-900">{{ count($artifactsForUi) }}</strong> типов,
-                        <strong class="text-slate-900">{{ $totalElementsUi }}</strong> записей
+                        <strong class="text-slate-900">{{ count($artifactsForUi) }}</strong> {{ __('sa.level.types_noun') }},
+                        <strong class="text-slate-900">{{ $totalElementsUi }}</strong> {{ __('sa.level.records_noun') }}
                     </span>
                 @else
-                    <span class="font-bold uppercase tracking-wide text-slate-400">На уровне</span>
+                    <span class="font-bold uppercase tracking-wide text-slate-400">{{ __('sa.level.summary_on_level') }}</span>
                     <span class="mt-1 block sm:mt-0 sm:inline">
-                        <strong class="text-slate-900">{{ count($artifactsForUi) }}</strong> типов,
-                        <strong class="text-slate-900">{{ $totalElementsUi }}</strong> записей
+                        <strong class="text-slate-900">{{ count($artifactsForUi) }}</strong> {{ __('sa.level.types_noun') }},
+                        <strong class="text-slate-900">{{ $totalElementsUi }}</strong> {{ __('sa.level.records_noun') }}
                     </span>
                 @endif
             </p>
@@ -151,7 +153,7 @@
         <article @if ($isArtifactFiltered) data-artifact-filter="{{ $artifactFilter }}" @endif>
             <header class="mb-8 max-w-4xl">
                 <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-800">
-                    Уровень {{ $level }}
+                    {{ __('sa.level.level_badge', ['n' => $level]) }}
                 </span>
                 <h2 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
                     {{ $levelMeta['title'] }}
@@ -162,11 +164,11 @@
             </header>
 
             <p class="mb-8 max-w-4xl text-sm leading-relaxed text-slate-600">
-                Артефакты уровня — по ТЗ п. 12; данные в <code class="rounded-md bg-slate-200/60 px-1.5 py-0.5 font-mono text-xs text-slate-800">sa_elements</code>.
+                {!! __('sa.level.artifacts_intro', ['table' => '<code class="rounded-md bg-slate-200/60 px-1.5 py-0.5 font-mono text-xs text-slate-800">sa_elements</code>']) !!}
                 @if ($level === 1)
-                    Трассировка на предыдущий уровень для L1 не задаётся (п. 5.3.2).
+                    {{ __('sa.level.trace_l1') }}
                 @else
-                    Связь с элементами <strong>L{{ $level - 1 }}</strong> — поле «Основание на L{{ $level - 1 }}».
+                    {{ __('sa.level.trace_ln', ['n' => $level - 1]) }}
                 @endif
             </p>
 
