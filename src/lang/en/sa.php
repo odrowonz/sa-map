@@ -112,6 +112,7 @@ return [
         'filtered_banner' => 'Showing only type <strong>:name</strong>',
         'all_types_level' => 'All types on level',
         'level_badge' => 'Level :n',
+        'question_aria' => 'Show level description',
         'artifacts_intro' => 'Level artifacts — per spec §12; data in :table.',
         'trace_l1' => 'No upstream trace for L1 (§5.3.2).',
         'trace_ln' => 'Link to L:n elements — field “Basis on L:n”.',

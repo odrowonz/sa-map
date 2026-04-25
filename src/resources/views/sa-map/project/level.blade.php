@@ -15,9 +15,7 @@
         ))
         : $artifactsForUi;
 
-    $totalElementsDisplay = (int) collect($artifactsForDisplay)->sum('elementCount');
     $isArtifactFiltered = $artifactFilter !== null;
-    $recordsWordDisplay = $totalElementsDisplay === 1 ? __('sa.level.record_one') : __('sa.level.records_many');
 @endphp
 
 @section('title')
@@ -48,7 +46,16 @@
                 "
             >
                 <span class="min-w-0 truncate" title="{{ $a['label'] }}">{{ $a['label'] }}</span>
-                <span class="shrink-0 tabular-nums text-[10px] opacity-80 {{ $tocActive ? 'text-slate-200' : 'text-slate-500' }}">{{ $a['elementCount'] }}</span>
+                <span class="ml-auto inline-flex shrink-0 items-center gap-1">
+                    @if ($isArtifactFiltered && $tocActive)
+                        <span class="inline-flex h-4 w-4 items-center justify-center text-blue-200" title="{{ __('sa.level.filter_label') }}" aria-label="{{ __('sa.level.filter_label') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
+                                <path d="M2.5 4.75A.75.75 0 0 1 3.25 4h13.5a.75.75 0 0 1 .53 1.28l-5.22 5.22a.75.75 0 0 0-.22.53V15.5a.75.75 0 0 1-1.06.69l-2-1A.75.75 0 0 1 8.5 14.5v-3.47a.75.75 0 0 0-.22-.53L3.06 5.28a.75.75 0 0 1-.56-.53Z" />
+                            </svg>
+                        </span>
+                    @endif
+                    <span class="tabular-nums text-[10px] opacity-80 {{ $tocActive ? 'text-slate-200' : 'text-slate-500' }}">{{ $a['elementCount'] }}</span>
+                </span>
             </a>
         @endforeach
     </div>
@@ -146,42 +153,45 @@
 
 @section('workspace_main')
     <div class="px-4 py-6 sm:px-8 lg:px-10">
-        @if ($isArtifactFiltered)
-            <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-950">
-                <p class="min-w-0">
-                    {!! __('sa.level.filtered_banner', ['name' => e($artifactFilterLabel)]) !!}
-                    · <span class="tabular-nums">{{ $totalElementsDisplay }}</span> {{ $recordsWordDisplay }}
-                </p>
-                <a
-                    href="{{ route('projects.level', [$project, $level]) }}"
-                    class="shrink-0 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                    {{ __('sa.level.all_types_level') }}
-                </a>
-            </div>
-        @endif
-
-        <article @if ($isArtifactFiltered) data-artifact-filter="{{ $artifactFilter }}" @endif class="border-t border-slate-200/80 pt-6">
-            <header class="mb-8 max-w-4xl">
-                <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-800">
-                    {{ __('sa.level.level_badge', ['n' => $level]) }}
-                </span>
-                <h2 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-                    {{ $levelMeta['title'] }}
-                </h2>
-                <p class="mt-2 text-lg italic text-slate-500">
-                    {{ $levelMeta['question'] }}
-                </p>
+        <article @if ($isArtifactFiltered) data-artifact-filter="{{ $artifactFilter }}" @endif class="pt-2">
+            <header class="mb-6 mx-auto max-w-4xl">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <span class="inline-flex shrink-0 items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-blue-800">
+                        {{ __('sa.level.level_badge', ['n' => $level]) }}
+                    </span>
+                    <div class="relative min-w-0" data-level-question-wrap>
+                        <h2 class="min-w-0 text-xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-2xl">
+                            {{ $levelMeta['title'] }}
+                            <span
+                                id="level-question-opener"
+                                class="inline-flex cursor-pointer select-none align-super text-slate-400 transition hover:text-slate-700 focus:outline-none"
+                                data-level-question-btn
+                                aria-expanded="false"
+                                aria-controls="level-question-hint"
+                                role="button"
+                                tabindex="0"
+                                title="{{ __('sa.level.question_aria') }}"
+                            >
+                                <span class="sr-only">{{ __('sa.level.question_aria') }}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5 -translate-y-0.5" aria-hidden="true">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                                    />
+                                </svg>
+                            </span>
+                        </h2>
+                        <div
+                            id="level-question-hint"
+                            class="absolute right-0 top-full z-30 mt-2 hidden w-[min(100vw-2rem,20rem)] rounded-xl border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-700 shadow-lg"
+                            data-level-question-panel
+                            role="region"
+                            aria-labelledby="level-question-opener"
+                        >
+                            <p class="m-0 text-slate-600 italic">{{ $levelMeta['question'] }}</p>
+                        </div>
+                    </div>
+                </div>
             </header>
-
-            <p class="mb-8 max-w-4xl text-sm leading-relaxed text-slate-600">
-                {!! __('sa.level.artifacts_intro', ['table' => '<code class="rounded-md bg-slate-200/60 px-1.5 py-0.5 font-mono text-xs text-slate-800">sa_elements</code>']) !!}
-                @if ($level === 1)
-                    {{ __('sa.level.trace_l1') }}
-                @else
-                    {{ __('sa.level.trace_ln', ['n' => $level - 1]) }}
-                @endif
-            </p>
 
             @include('sa-map.project.partials.artifact-forms', [
                 'project' => $project,
@@ -287,6 +297,50 @@
                     });
                 }
             });
+
+            var levelQWrap = document.querySelector('[data-level-question-wrap]');
+            if (levelQWrap) {
+                var levelQBtn = levelQWrap.querySelector('[data-level-question-btn]');
+                var levelQPanel = document.getElementById('level-question-hint');
+                function levelQSet(isOpen) {
+                    if (!levelQPanel || !levelQBtn) {
+                        return;
+                    }
+                    if (isOpen) {
+                        levelQPanel.classList.remove('hidden');
+                        levelQBtn.setAttribute('aria-expanded', 'true');
+                    } else {
+                        levelQPanel.classList.add('hidden');
+                        levelQBtn.setAttribute('aria-expanded', 'false');
+                    }
+                }
+                if (levelQBtn && levelQPanel) {
+                    levelQBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        var open = !levelQPanel.classList.contains('hidden');
+                        levelQSet(!open);
+                    });
+                    levelQBtn.addEventListener('keydown', function (e) {
+                        if (e.key !== 'Enter' && e.key !== ' ') {
+                            return;
+                        }
+                        e.preventDefault();
+                        var open = !levelQPanel.classList.contains('hidden');
+                        levelQSet(!open);
+                    });
+                    document.addEventListener('click', function (e) {
+                        if (levelQWrap.contains(e.target)) {
+                            return;
+                        }
+                        levelQSet(false);
+                    });
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') {
+                            levelQSet(false);
+                        }
+                    });
+                }
+            }
         })();
     </script>
 @endpush
