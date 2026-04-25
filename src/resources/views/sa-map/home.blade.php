@@ -84,8 +84,6 @@
             </header>
 
             <div class="max-w-4xl rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
-                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.home.version') }}</span>
-
                 @auth
                     <p class="mt-6 text-sm leading-relaxed text-slate-600">
                         {!! __('sa.home.logged_in_as', ['email' => '<strong>'.e(Auth::user()->email).'</strong>']) !!}

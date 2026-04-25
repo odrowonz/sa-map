@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', config('app.name'))</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="flex min-h-screen flex-col bg-slate-100 antialiased lg:h-screen lg:overflow-hidden">
@@ -31,13 +32,20 @@
                 @endauth
             </div>
             <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <p class="shrink-0 px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                    @hasSection('workspace_sidebar_heading')
-                        @yield('workspace_sidebar_heading')
-                    @else
-                        {{ __('sa.workspace.sidebar_artifact_types') }}
+                <div class="shrink-0 flex items-baseline justify-between gap-2 px-3 pb-2 pt-1">
+                    <p class="min-w-0 flex-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                        @hasSection('workspace_sidebar_heading')
+                            @yield('workspace_sidebar_heading')
+                        @else
+                            {{ __('sa.workspace.sidebar_artifact_types') }}
+                        @endif
+                    </p>
+                    @hasSection('workspace_sidebar_heading_stat')
+                        <span class="shrink-0 tabular-nums text-[10px] font-bold tracking-wide text-slate-400" aria-hidden="true">
+                            @yield('workspace_sidebar_heading_stat')
+                        </span>
                     @endif
-                </p>
+                </div>
                 <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2">
                     @yield('workspace_sidebar')
                 </div>

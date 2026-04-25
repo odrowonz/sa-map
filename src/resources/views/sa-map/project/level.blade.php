@@ -15,7 +15,6 @@
         ))
         : $artifactsForUi;
 
-    $totalElementsUi = (int) collect($artifactsForUi)->sum('elementCount');
     $totalElementsDisplay = (int) collect($artifactsForDisplay)->sum('elementCount');
     $isArtifactFiltered = $artifactFilter !== null;
     $recordsWordDisplay = $totalElementsDisplay === 1 ? __('sa.level.record_one') : __('sa.level.records_many');
@@ -23,6 +22,10 @@
 
 @section('title')
     {{ $project->name }} · L{{ $level }}{{ $artifactFilterLabel ? ' — '.$artifactFilterLabel : '' }} — {{ config('app.name') }}
+@endsection
+
+@section('workspace_sidebar_heading_stat')
+    {{ count($artifactsForUi) }}
 @endsection
 
 @section('workspace_sidebar')
@@ -53,6 +56,21 @@
         <a href="{{ route('projects.level', [$project, $level]) }}" class="text-xs font-semibold text-blue-400 hover:text-blue-300">
             {{ __('sa.workspace.all_types') }}
         </a>
+        @unless ($isArtifactFiltered)
+            <div class="mt-3">
+                <label for="artifact-filter" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    {{ __('sa.level.filter_label') }}
+                </label>
+                <input
+                    id="artifact-filter"
+                    type="search"
+                    name="artifact_filter"
+                    autocomplete="off"
+                    placeholder="{{ __('sa.level.filter_placeholder') }}"
+                    class="mt-1.5 w-full rounded-lg border border-slate-600 bg-slate-900/60 px-3 py-2 text-xs text-slate-100 shadow-sm placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                />
+            </div>
+        @endunless
     </div>
 @endsection
 
@@ -143,38 +161,7 @@
             </div>
         @endif
 
-        <div class="mb-8 flex flex-col gap-4 border-b border-slate-200/80 pb-6 sm:flex-row sm:items-end sm:justify-between">
-            @unless ($isArtifactFiltered)
-                <div class="min-w-0 flex-1 max-w-md">
-                    <label for="artifact-filter" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.level.filter_label') }}</label>
-                    <input
-                        id="artifact-filter"
-                        type="search"
-                        name="artifact_filter"
-                        autocomplete="off"
-                        placeholder="{{ __('sa.level.filter_placeholder') }}"
-                        class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
-                    />
-                </div>
-            @endunless
-            <p class="text-xs leading-relaxed text-slate-600 sm:text-right {{ $isArtifactFiltered ? 'sm:text-left' : '' }}" id="artifact-level-summary">
-                @if ($isArtifactFiltered)
-                    <span class="font-bold uppercase tracking-wide text-slate-400">{{ __('sa.level.summary_total') }}</span>
-                    <span class="mt-1 block sm:mt-0 sm:inline">
-                        <strong class="text-slate-900">{{ count($artifactsForUi) }}</strong> {{ __('sa.level.types_noun') }},
-                        <strong class="text-slate-900">{{ $totalElementsUi }}</strong> {{ __('sa.level.records_noun') }}
-                    </span>
-                @else
-                    <span class="font-bold uppercase tracking-wide text-slate-400">{{ __('sa.level.summary_on_level') }}</span>
-                    <span class="mt-1 block sm:mt-0 sm:inline">
-                        <strong class="text-slate-900">{{ count($artifactsForUi) }}</strong> {{ __('sa.level.types_noun') }},
-                        <strong class="text-slate-900">{{ $totalElementsUi }}</strong> {{ __('sa.level.records_noun') }}
-                    </span>
-                @endif
-            </p>
-        </div>
-
-        <article @if ($isArtifactFiltered) data-artifact-filter="{{ $artifactFilter }}" @endif>
+        <article @if ($isArtifactFiltered) data-artifact-filter="{{ $artifactFilter }}" @endif class="border-t border-slate-200/80 pt-6">
             <header class="mb-8 max-w-4xl">
                 <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-800">
                     {{ __('sa.level.level_badge', ['n' => $level]) }}
