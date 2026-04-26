@@ -43,6 +43,54 @@ final class AttachmentFileIcon
         return self::generic($attachment);
     }
 
+    /** Имя иконки vscode-icons (`file_type_{slug}.svg`) для упаковки в ZIP и локальных `src` в MD. */
+    public static function vscodeIconSlug(Attachment $attachment): string
+    {
+        if ($attachment->canPreviewInline()) {
+            $ext = strtolower(pathinfo($attachment->original_name, PATHINFO_EXTENSION));
+
+            return match ($ext) {
+                'png' => 'png',
+                'jpg', 'jpeg' => 'jpg',
+                'gif' => 'gif',
+                'webp' => 'webp',
+                'svg' => 'svg',
+                'bmp', 'ico' => 'image',
+                default => 'image',
+            };
+        }
+
+        $cfg = config('sa_map.file_icons');
+        if (! is_array($cfg)) {
+            return 'file';
+        }
+
+        $name = mb_strtolower($attachment->original_name);
+        foreach ($cfg['patterns'] ?? [] as $row) {
+            if (! is_array($row) || empty($row['icon'])) {
+                continue;
+            }
+            if (str_contains($name, mb_strtolower((string) ($row['contains'] ?? '')))) {
+                return self::normalizeIconSlug((string) $row['icon']);
+            }
+        }
+
+        $ext = strtolower(pathinfo($attachment->original_name, PATHINFO_EXTENSION));
+        $map = $cfg['extensions'] ?? [];
+        if ($ext !== '' && isset($map[$ext]) && is_array($map[$ext]) && ! empty($map[$ext]['icon'])) {
+            return self::normalizeIconSlug((string) $map[$ext]['icon']);
+        }
+
+        return 'file';
+    }
+
+    private static function normalizeIconSlug(string $icon): string
+    {
+        $icon = preg_replace('/[^a-z0-9_]/i', '', $icon) ?? '';
+
+        return $icon !== '' ? $icon : 'file';
+    }
+
     /**
      * @param  array{icon: string, label?: string}  $row
      * @return array{mode: 'brand', url: string, label: string}

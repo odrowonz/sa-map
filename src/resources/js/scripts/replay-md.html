@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Повтор рендера MD (Nunjucks, без Node)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 52rem; margin: 1rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.15rem; }
+    h2 { font-size: 1rem; margin-top: 1.25rem; }
+    label { display: block; margin-top: 0.75rem; font-weight: 600; }
+    button { margin-top: 0.5rem; margin-right: 0.5rem; padding: 0.45rem 1rem; cursor: pointer; }
+    .hint { color: #475569; font-size: 0.85rem; margin-top: 0.35rem; }
+    .status { margin-top: 1rem; padding: 0.65rem 0.85rem; border-radius: 0.375rem; font-size: 0.9rem; white-space: pre-wrap; }
+    .status.ok { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+    .status.bad { background: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
+    .status.hide { display: none; }
+    textarea { width: 100%; min-height: 12rem; font-family: ui-monospace, monospace; font-size: 0.8rem; margin-top: 0.35rem; box-sizing: border-box; }
+    input[type="text"] { width: 100%; max-width: 28rem; margin-top: 0.35rem; }
+    .bound { font-size: 0.85rem; color: #334155; margin-top: 0.25rem; }
+    code { font-size: 0.88em; }
+    .hide { display: none !important; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/nunjucks@3.2.4/browser/nunjucks.min.js"></script>
+</head>
+<body>
+  <h1>Повтор рендера Markdown (Nunjucks)</h1>
+  <p class="hint">Правьте JSON экспорта MD (например <code>{slug}.json</code> — один файл с манифестом и полями Nunjucks) и <code>*.njk</code> в редакторе, затем нажмите прогон. Нужен интернет при первой загрузке (Nunjucks с CDN). Открывайте HTML из папки с распакованным ZIP — пути <code>icons/</code>, <code>files/</code>, <code>pics/</code> в MD останутся относительными.</p>
+
+  <h2>Режим Chromium / Edge (удобнее)</h2>
+  <p class="hint">Один раз привяжите файлы. Каждый прогон <strong>заново читает с диска</strong> — после сохранения в редакторе снова нажмите «Прогон Nunjucks», переоткрывать файлы не нужно.</p>
+  <div id="fsa-block">
+    <button type="button" id="pick-ctx" disabled>Привязать JSON экспорта MD…</button>
+    <button type="button" id="pick-tpl" disabled>Привязать шаблон .njk…</button>
+    <div class="bound" id="fsa-ctx-label">Контекст: не выбран</div>
+    <div class="bound" id="fsa-tpl-label">Шаблон: не выбран</div>
+  </div>
+  <p id="fsa-none" class="hint hide">File System Access недоступен — используйте поля ниже и после правки на диске снова выберите файлы вручную.</p>
+
+  <h2>Любой браузер</h2>
+  <label for="ctx">JSON экспорта MD (<code>{slug}.json</code> из архива)</label>
+  <input id="ctx" type="file" accept=".json,application/json" />
+
+  <label for="tpl">Файл <code>*.njk</code></label>
+  <input id="tpl" type="file" accept=".njk,.html,text/plain" />
+
+  <label for="out">Имя скачиваемого MD</label>
+  <input id="out" type="text" value="__SA_EXPORT_SLUG__.md" />
+
+  <div>
+    <button type="button" id="go"><strong>Прогон Nunjucks</strong> → скачать MD</button>
+  </div>
+
+  <div id="status" class="status hide" role="status"></div>
+
+  <label for="preview">Фрагмент результата (предпросмотр)</label>
+  <textarea id="preview" readonly placeholder="После успешного прогона здесь появится начало MD…"></textarea>
+
+  <script>
+    (function () {
+      var outEl0 = document.getElementById('out');
+      if (outEl0 && String(outEl0.value).indexOf('__SA_EXPORT_SLUG__') !== -1) {
+        outEl0.value = 'local.md';
+      }
+      /** Синхронизируйте с render-export-md.cjs / saMapFileIcons.js */
+      var VSCODE_ICONS_TAG = 'v12.17.0';
+      var PATTERNS = [
+        { contains: 'postman', icon: 'postman' },
+        { contains: 'soapui', icon: 'xml' },
+        { contains: 'insomnia', icon: 'insomnia' },
+        { contains: 'swagger', icon: 'swagger' },
+        { contains: 'openapi', icon: 'swagger' },
+        { contains: 'asyncapi', icon: 'swagger' },
+        { contains: 'graphql', icon: 'graphql' },
+        { contains: 'camunda', icon: 'xml' },
+        { contains: 'kubernetes', icon: 'helm' },
+        { contains: 'docker', icon: 'docker' },
+        { contains: 'jenkins', icon: 'jenkins' },
+        { contains: 'gitlab', icon: 'gitlab' },
+        { contains: 'github', icon: 'github' },
+        { contains: 'terraform', icon: 'terraform' },
+        { contains: 'ansible', icon: 'ansible' },
+        { contains: 'prometheus', icon: 'prometheus' },
+        { contains: 'grafana', icon: 'grafana' },
+        { contains: 'nginx', icon: 'nginx' },
+        { contains: 'kafka', icon: 'apachekafka' },
+        { contains: 'elastic', icon: 'elastic' },
+        { contains: 'mongodb', icon: 'mongo' },
+        { contains: 'postgresql', icon: 'pgsql' },
+        { contains: 'mysql', icon: 'mysql' },
+        { contains: 'redis', icon: 'sql' },
+        { contains: 'package.json', icon: 'npm' },
+        { contains: 'pom.xml', icon: 'maven' },
+        { contains: 'build.gradle', icon: 'gradle' },
+      ];
+      var EXTENSIONS = {
+        bpmn: 'xml', cmmn: 'xml', dmn: 'xml', drawio: 'drawio', dio: 'drawio',
+        uml: 'mermaid', puml: 'mermaid', plantuml: 'mermaid', xmi: 'eclipse', mdj: 'json',
+        pdf: 'pdf', doc: 'word', docx: 'word', xls: 'excel', xlsx: 'excel',
+        ppt: 'powerpoint', pptx: 'powerpoint', md: 'markdown', markdown: 'markdown',
+        zip: 'zip', '7z': 'zip', rar: 'zip', gz: 'gnu', tar: 'gnu', sql: 'sql',
+        wsdl: 'xml', yaml: 'yaml', yml: 'yaml', xml: 'xml', json: 'json',
+        proto: 'protobuf', avro: 'avro', toml: 'toml',
+      };
+      function extFromName(name) {
+        var n = String(name || '');
+        var i = n.lastIndexOf('.');
+        if (i < 0 || i === n.length - 1) return '';
+        return n.slice(i + 1).toLowerCase();
+      }
+      function resolveIconSlug(originalName) {
+        var lower = String(originalName || '').toLowerCase();
+        for (var p = 0; p < PATTERNS.length; p++) {
+          var row = PATTERNS[p];
+          if (lower.indexOf(row.contains.toLowerCase()) !== -1) return row.icon;
+        }
+        var ext = extFromName(lower);
+        if (ext && EXTENSIONS[ext]) return EXTENSIONS[ext];
+        return 'file';
+      }
+      function cdnUrl(icon) {
+        var safe = String(icon || 'file').replace(/[^a-z0-9_]/gi, '') || 'file';
+        return 'https://cdn.jsdelivr.net/gh/vscode-icons/vscode-icons@' + VSCODE_ICONS_TAG + '/icons/file_type_' + safe + '.svg';
+      }
+      function escAttr(s) {
+        return String(s || '')
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/</g, '&lt;');
+      }
+      function fileIconImgHtml(att) {
+        var originalName = typeof att.original_name === 'string' ? att.original_name : '';
+        var slug = resolveIconSlug(originalName);
+        var ext = extFromName(originalName);
+        var alt = ext ? ('.' + ext.toUpperCase()) : 'file';
+        var zipIcon = typeof att.icon_zip_path === 'string' ? att.icon_zip_path.trim() : '';
+        var url = zipIcon ? zipIcon : cdnUrl(slug);
+        return '<img src="' + escAttr(url) + '" width="16" height="16" alt="' + escAttr(alt) + '" style="vertical-align:middle;margin-right:0.35em;" />';
+      }
+
+      function readFileText(file) {
+        return new Promise(function (resolve, reject) {
+          var r = new FileReader();
+          r.onload = function () { resolve(String(r.result || '')); };
+          r.onerror = function () { reject(new Error('Не удалось прочитать файл.')); };
+          r.readAsText(file, 'UTF-8');
+        });
+      }
+
+      function buildEnv() {
+        var env = new nunjucks.Environment(null, {
+          autoescape: false,
+          throwOnUndefined: false,
+        });
+        env.addFilter('nl2br', function (str) {
+          if (str == null || str === '') return '';
+          return String(str).replace(/\n/g, '<br />\n');
+        });
+        env.addFilter('md_file_icon', function (att) {
+          if (!att || typeof att !== 'object') return '';
+          return fileIconImgHtml(att);
+        });
+        return env;
+      }
+
+      function setStatus(ok, text) {
+        var el = document.getElementById('status');
+        el.className = 'status ' + (ok ? 'ok' : 'bad');
+        el.textContent = text;
+        el.classList.remove('hide');
+      }
+      function clearStatus() {
+        var el = document.getElementById('status');
+        el.className = 'status hide';
+        el.textContent = '';
+      }
+
+      var ctxHandle = null;
+      var tplHandle = null;
+      var fsaOk = typeof window.showOpenFilePicker === 'function';
+
+      if (fsaOk) {
+        document.getElementById('pick-ctx').disabled = false;
+        document.getElementById('pick-tpl').disabled = false;
+        document.getElementById('fsa-none').classList.add('hide');
+      } else {
+        document.getElementById('fsa-block').classList.add('hide');
+        document.getElementById('fsa-none').classList.remove('hide');
+      }
+
+      document.getElementById('pick-ctx').addEventListener('click', function () {
+        if (!fsaOk) return;
+        window.showOpenFilePicker({
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+          excludeAcceptAllOption: true,
+          multiple: false,
+        }).then(function (handles) {
+          if (!handles || !handles[0]) return;
+          ctxHandle = handles[0];
+          return ctxHandle.getFile();
+        }).then(function (file) {
+          if (file) document.getElementById('fsa-ctx-label').textContent = 'Контекст: ' + file.name;
+        }).catch(function () { /* cancel */ });
+      });
+
+      document.getElementById('pick-tpl').addEventListener('click', function () {
+        if (!fsaOk) return;
+        window.showOpenFilePicker({
+          types: [{ description: 'Nunjucks', accept: { 'text/plain': ['.njk'] } }],
+          excludeAcceptAllOption: true,
+          multiple: false,
+        }).then(function (handles) {
+          if (!handles || !handles[0]) return;
+          tplHandle = handles[0];
+          return tplHandle.getFile();
+        }).then(function (file) {
+          if (file) document.getElementById('fsa-tpl-label').textContent = 'Шаблон: ' + file.name;
+        }).catch(function () { /* cancel */ });
+      });
+
+      function loadSources() {
+        if (fsaOk && ctxHandle && tplHandle) {
+          return Promise.all([
+            ctxHandle.getFile().then(function (f) { return f.text(); }),
+            tplHandle.getFile().then(function (f) { return f.text(); }),
+          ]);
+        }
+        var ctxInput = document.getElementById('ctx');
+        var tplInput = document.getElementById('tpl');
+        if (!ctxInput.files || !ctxInput.files[0]) {
+          return Promise.reject(new Error('Выберите JSON экспорта MD (поле ниже или «Привязать» в Chromium).'));
+        }
+        if (!tplInput.files || !tplInput.files[0]) {
+          return Promise.reject(new Error('Выберите файл шаблона .njk.'));
+        }
+        return Promise.all([
+          readFileText(ctxInput.files[0]),
+          readFileText(tplInput.files[0]),
+        ]);
+      }
+
+      document.getElementById('go').addEventListener('click', function () {
+        var prev = document.getElementById('preview');
+        clearStatus();
+        prev.value = '';
+
+        if (typeof nunjucks === 'undefined') {
+          setStatus(false, 'Ошибка: не загрузился Nunjucks с CDN. Проверьте сеть.');
+          return;
+        }
+
+        var outName = document.getElementById('out').value.trim() || 'local.md';
+
+        loadSources()
+          .then(function (pair) {
+            var ctxText = pair[0];
+            var tpl = pair[1];
+            var ctx;
+            try {
+              ctx = JSON.parse(ctxText);
+            } catch (e) {
+              throw new Error('Ошибка JSON контекста: ' + (e && e.message ? e.message : String(e)));
+            }
+            var env = buildEnv();
+            var md;
+            try {
+              md = env.renderString(tpl, ctx);
+            } catch (e) {
+              var msg = (e && e.message) ? e.message : String(e);
+              throw new Error('Ошибка Nunjucks: ' + msg);
+            }
+            prev.value = md.length > 120000 ? md.slice(0, 120000) + '\n\n… [обрезано]' : md;
+            var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = outName;
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            URL.revokeObjectURL(a.href);
+            a.remove();
+            setStatus(true, 'Успех: Markdown сформирован, запущено скачивание «' + outName + '». Сохраните файл в ту же папку, что и архив, если нужны рабочие относительные ссылки.');
+          })
+          .catch(function (e) {
+            setStatus(false, (e && e.message) ? e.message : String(e));
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

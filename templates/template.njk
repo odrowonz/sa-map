@@ -1,47 +1,60 @@
-# Техническое задание: {{ name | default("Системный анализ") }}
+{# data[field_key] — объект { title, body, attachments } или [] таких, или string[] (поля *Path) с путями к схемам. Форматирование MD — здесь, не в data. #}
+{%- macro md_record(r) -%}
+{%- if r.title | default('') | trim or r.body | default('') | trim or (r.attachments and r.attachments.length) -%}
+{%- if r.title | default('') | trim -%}**{{ r.title | trim }}**{%- if r.body | default('') | trim -%}
+
+{{ r.body }}{% endif -%}
+{%- elif r.body | default('') | trim -%}
+{{ r.body }}{% endif -%}
+{%- for a in r.attachments or [] -%}
+{%- if a | is_image_att %}
+
+![{{ a.original_name | default("file") | replace("[", "") | replace("]", "") | replace("\\", "") }}]({{ a.zip_path }})
+{%- else %}
+
+- {{ a | md_file_icon }}[{{ a.original_name | default("file") | replace("[", "") | replace("]", "") }}]({{ a.zip_path }})
+{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{%- endmacro -%}
+
+# Техническое задание: {{ project.name | default("Системный анализ") }}
 *Дата генерации: {{ metadata.export_date }}*
-
-{# Функция-хелпер для проверки на массив (в Nunjucks нет встроенной) #}
-{# Предполагаем, что шаблонизатор запущен с расширением is_array #}
-
-{% for lvl_conf in metadata.levels_config %}
+{%- for lvl_conf in metadata.levels_config %}
 {% set lvl_id = "L" + lvl_conf.n %}
 <details>
-  <summary><b>LEVEL {{ lvl_conf.n }} — {{ lvl_conf.title }}</b></summary>
-  
-  <p><i>{{ lvl_conf.q }}</i></p>
+<summary><strong>LEVEL {{ lvl_conf.n }} — {{ lvl_conf.title }}</strong></summary>
 
-  {# Пробегаемся по полям уровня, заданным в конфигурации #}
-  {% for field in lvl_conf.fields %}
-    {% set field_key = lvl_id + "_" + field.name %}
-    {% set field_value = data[field_key] %}
+*{{ lvl_conf.q }}*
+{%- for field in lvl_conf.fields %}
+{% set field_key = lvl_id + "_" + field.name %}
+{% set field_value = data[field_key] %}
+{%- if field_value %}
 
-    {% if field_value %}
-      <h3>{{ field.name }}</h3>
-      
-      {# ЛОГИКА ОТОБРАЖЕНИЯ СХЕМ (если поле помечено isArray и содержит Path) #}
-      {% if field.isArray and "Path" in field.name %}
-        {% for path in field_value %}
-          ![Схема ({{ field.name }})]({{ path }})
-        {% endfor %}
-      
-      {# ЛОГИКА ОТОБРАЖЕНИЯ СПИСКОВ #}
-      {% elif field.isArray %}
-        <ul>
-          {% for item in field_value %}
-            <li>{{ item }}</li>
-          {% endfor %}
-        </ul>
-      
-      {# ОБЫЧНЫЙ ТЕКСТ #}
-      {% else %}
-        <p>{{ field_value | nl2br }}</p>
-      {% endif %}
-    {% endif %}
+### {{ field.label | default(field.name) }}
+{%- if field.isArray and "Path" in field.name %}
+{%- for x in field_value %}
+{%- if x | is_string %}
+![Схема ({{ field.label | default(field.name) }})]({{ x }})
+{%- else %}
+{{ md_record(x) }}
+{%- if not loop.last %}{{ "\n" }}{% endif %}
+{%- endif %}
+{%- endfor %}
+{%- elif field.isArray %}
+{%- for item in field_value %}
 
-  {% endfor %}
+
+{{ md_record(item) }}{% if not loop.last %}
+
+
+{% endif -%}
+{%- endfor %}
+{%- else %}
+{{ md_record(field_value) }}
+{%- endif %}
+{%- endif %}
+{%- endfor %}
 </details>
 {% endfor %}
-
 ---
-*Сгенерировано автоматически на основе SA Operating Map v3.*

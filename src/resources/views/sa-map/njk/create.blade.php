@@ -31,6 +31,22 @@
             @csrf
             <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
                 @include('sa-map.njk._form', ['template' => null])
+                @if (auth()->user()->isAdmin())
+                    <div class="mt-6 rounded-xl border border-sky-200 bg-sky-50/50 px-4 py-3">
+                        <label class="flex cursor-pointer items-start gap-3">
+                            <input
+                                type="checkbox"
+                                name="is_system"
+                                value="1"
+                                class="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                            />
+                            <span>
+                                <span class="block text-sm font-semibold text-slate-900">{{ __('sa.njk.create_as_system_label') }}</span>
+                                <span class="mt-0.5 block text-xs text-slate-600">{{ __('sa.njk.create_as_system_help') }}</span>
+                            </span>
+                        </label>
+                    </div>
+                @endif
                 <div class="mt-8 flex flex-wrap gap-3 border-t border-slate-100 pt-6">
                     <button type="submit" class="rounded-xl bg-slate-800 px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-slate-700">
                         {{ __('sa.njk.save_create') }}

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +23,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('profile-update', function (Request $request) {
+            $key = (string) ($request->user()?->getAuthIdentifier() ?? $request->ip());
+
+            return Limit::perMinute(15)->by('profile|'.$key);
+        });
+
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(10)->by('login|'.$request->ip());
+        });
+
+        RateLimiter::for('register', function (Request $request) {
+            return Limit::perMinute(5)->by('register|'.$request->ip());
+        });
+
         $appUrl = config('app.url');
         if (! is_string($appUrl) || $appUrl === '') {
             return;

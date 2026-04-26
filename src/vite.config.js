@@ -8,6 +8,8 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/njk-editor.js',
+                'resources/js/project-export-wizard.js',
+                'resources/js/project-md-export.js',
             ],
             refresh: true,
         }),

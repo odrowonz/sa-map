@@ -19,7 +19,6 @@ class ElementController extends Controller
             'artifact_key' => ['required', 'string', 'max:120'],
             'title' => ['nullable', 'string', 'max:500'],
             'body' => ['nullable', 'string', 'max:65535'],
-            'include_in_export' => ['sometimes', 'boolean'],
             'upstream_element_ids' => ['nullable', 'array'],
             'upstream_element_ids.*' => ['uuid'],
         ]);
@@ -50,7 +49,6 @@ class ElementController extends Controller
             }
             $element->fill([
                 'content' => $content,
-                'include_in_export' => $request->boolean('include_in_export', true),
                 'sort_order' => 0,
             ]);
             $element->save();
@@ -65,7 +63,6 @@ class ElementController extends Controller
                 'level' => $level,
                 'artifact_key' => $artifactKey,
                 'content' => $content,
-                'include_in_export' => $request->boolean('include_in_export', true),
                 'sort_order' => $max + 1,
             ]);
             $row->id = (string) Str::uuid();
@@ -83,7 +80,6 @@ class ElementController extends Controller
         $validated = $request->validate([
             'title' => ['nullable', 'string', 'max:500'],
             'body' => ['nullable', 'string', 'max:65535'],
-            'include_in_export' => ['sometimes', 'boolean'],
             'upstream_element_ids' => ['nullable', 'array'],
             'upstream_element_ids.*' => ['uuid'],
         ]);
@@ -99,7 +95,6 @@ class ElementController extends Controller
 
         $element->update([
             'content' => $content,
-            'include_in_export' => $request->boolean('include_in_export', (bool) $element->include_in_export),
         ]);
 
         return redirect()->to(route('projects.level', [$project, $level]).'#'.$this->fragmentId($element->artifact_key));

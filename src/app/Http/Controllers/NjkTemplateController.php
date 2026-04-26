@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\NjkTemplate;
+use App\Models\Project;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,15 +21,19 @@ class NjkTemplateController extends Controller
             ->orderBy('title')
             ->get();
 
-        $userTemplates = NjkTemplate::query()
-            ->where('user_id', $user->id)
+        $userTemplatesQuery = NjkTemplate::query()
             ->where('is_system', false)
-            ->orderBy('title')
-            ->get();
+            ->with(['user:id,email'])
+            ->orderBy('user_id')
+            ->orderBy('title');
+
+        if (! $user->isAdmin()) {
+            $userTemplatesQuery->where('user_id', $user->id);
+        }
 
         return view('sa-map.njk.index', [
             'systemTemplates' => $systemTemplates,
-            'userTemplates' => $userTemplates,
+            'userTemplates' => $userTemplatesQuery->get(),
         ]);
     }
 
@@ -47,18 +53,37 @@ class NjkTemplateController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $rules = [
             'title' => ['required', 'string', 'max:255'],
             'filename' => ['required', 'string', 'max:255', 'regex:/\.njk$/i'],
             'body' => ['required', 'string'],
-        ]);
+        ];
+        if ($request->user()->isAdmin()) {
+            $rules['is_system'] = ['sometimes', 'boolean'];
+        }
+        $validated = $request->validate($rules);
 
-        $request->user()->njkTemplates()->create([
-            'title' => $validated['title'],
-            'filename' => basename($validated['filename']),
-            'body' => $validated['body'],
-            'is_system' => false,
-        ]);
+        $title = $validated['title'];
+        $filename = basename($validated['filename']);
+        $body = $validated['body'];
+        $asSystem = $request->user()->isAdmin() && $request->boolean('is_system');
+
+        if ($asSystem) {
+            NjkTemplate::query()->create([
+                'user_id' => null,
+                'title' => $title,
+                'filename' => $filename,
+                'body' => $body,
+                'is_system' => true,
+            ]);
+        } else {
+            $request->user()->njkTemplates()->create([
+                'title' => $title,
+                'filename' => $filename,
+                'body' => $body,
+                'is_system' => false,
+            ]);
+        }
 
         return redirect()->route('njk-templates.index')
             ->with('status', __('sa.njk.flash_created'));
@@ -101,6 +126,17 @@ class NjkTemplateController extends Controller
 
         return redirect()->route('njk-templates.index')
             ->with('status', __('sa.njk.flash_deleted'));
+    }
+
+    public function exportBody(Request $request, Project $project, NjkTemplate $njk_template): JsonResponse
+    {
+        $this->authorize('view', $project);
+        $this->authorize('view', $njk_template);
+
+        return response()->json([
+            'body' => $njk_template->body,
+            'filename' => $njk_template->filename,
+        ]);
     }
 
     public function download(Request $request, NjkTemplate $njkTemplate): Response

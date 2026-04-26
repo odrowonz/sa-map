@@ -30,7 +30,7 @@ class LoginController extends Controller
 
         return back()
             ->withInput($request->only('email'))
-            ->withErrors(['email' => 'Неверный email или пароль.']);
+            ->withErrors(['email' => __('sa.auth.login_failed')]);
     }
 
     public function destroy(Request $request): RedirectResponse

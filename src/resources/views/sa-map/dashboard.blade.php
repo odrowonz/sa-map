@@ -10,13 +10,6 @@
     @endphp
     <div class="space-y-0.5">
         <a
-            href="{{ $dash }}#overview"
-            data-cabinet-section="overview"
-            class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
-        >
-            {{ __('sa.dashboard.nav_overview') }}
-        </a>
-        <a
             href="{{ $dash }}#projects"
             data-cabinet-section="projects"
             class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
@@ -58,31 +51,12 @@
 
 @section('workspace_main')
     <div class="px-4 py-6 sm:px-8 lg:px-10">
-        <section id="overview" class="cabinet-section scroll-mt-6">
-            <header class="mb-6 max-w-4xl">
-                <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-800">
-                    {{ __('sa.dashboard.overview_badge') }}
-                </span>
-                <h2 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
-                    {{ __('sa.dashboard.overview_title') }}
-                </h2>
-                <p class="mt-2 text-lg italic text-slate-500">
-                    {{ __('sa.dashboard.overview_lead') }}
-                </p>
-            </header>
-            <p class="max-w-4xl text-sm leading-relaxed text-slate-600">
-                {{ __('sa.dashboard.overview_intro') }}
-                <a href="{{ route('home') }}" class="font-medium text-blue-600 hover:text-blue-800">{{ __('sa.dashboard.overview_home_link') }}</a>{{ __('sa.dashboard.overview_outro') }}
-            </p>
-        </section>
-
-        <section id="projects" class="cabinet-section mt-14 scroll-mt-6">
+        <section id="projects" class="cabinet-section scroll-mt-6">
             <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
-                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.dashboard.projects_badge') }}</span>
-                <h2 class="mt-4 text-xl font-bold text-slate-900">{{ __('sa.dashboard.projects_title') }}</h2>
-                <p class="mt-2 text-sm text-slate-600">
-                    {!! __('sa.dashboard.projects_lead', ['table' => '<code class="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-xs">sa_projects</code>']) !!}
-                </p>
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.dashboard.projects_badge') }}</span>
+                    <h2 class="text-xl font-bold text-slate-900">{{ __('sa.dashboard.projects_title') }}</h2>
+                </div>
 
                 <form method="post" action="{{ route('projects.store') }}" class="mt-8 flex flex-col gap-4 border-t border-slate-100 pt-6 sm:flex-row sm:items-end">
                     @csrf
@@ -154,10 +128,12 @@
 
         <section id="njk" class="cabinet-section mt-14 scroll-mt-6">
             <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
-                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.dashboard.njk_badge') }}</span>
-                <h2 class="mt-4 text-xl font-bold text-slate-900">{{ __('sa.dashboard.njk_title') }}</h2>
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.dashboard.njk_badge') }}</span>
+                    <h2 class="text-xl font-bold text-slate-900">{{ __('sa.dashboard.njk_title') }}</h2>
+                </div>
                 <p class="mt-2 text-sm leading-relaxed text-slate-600">
-                    {!! __('sa.dashboard.njk_lead', ['table' => '<code class="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-xs">sa_njk_templates</code>']) !!}
+                    {{ __('sa.dashboard.njk_lead') }}
                 </p>
                 <div class="mt-8">
                     <a
@@ -170,32 +146,112 @@
             </div>
         </section>
 
-        @php
-            $localeUiShort = match ($user->locale ?? 'ru') {
-                'kk' => 'ҚАЗ',
-                'ru' => 'РУС',
-                'en' => 'ENG',
-                default => strtoupper(substr((string) ($user->locale ?? 'ru'), 0, 3)),
-            };
-        @endphp
         <section id="profile" class="cabinet-section mt-14 scroll-mt-6 pb-8">
             <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-8">
-                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.dashboard.profile_badge') }}</span>
-                <h2 class="mt-4 text-xl font-bold text-slate-900">{{ __('sa.dashboard.profile_title') }}</h2>
-                <dl class="mt-6 grid gap-6 text-sm sm:grid-cols-2">
-                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
-                        <dt class="text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_email') }}</dt>
-                        <dd class="mt-1 font-semibold text-slate-900">{{ $user->email }}</dd>
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">{{ __('sa.dashboard.profile_badge') }}</span>
+                    <h2 class="text-xl font-bold text-slate-900">{{ __('sa.dashboard.profile_title') }}</h2>
+                </div>
+                <form method="post" action="{{ route('profile.update') }}" class="mt-8 max-w-2xl space-y-6">
+                    @csrf
+                    @method('PATCH')
+                    <div>
+                        <label for="profile-email" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_email') }}</label>
+                        <input
+                            id="profile-email"
+                            name="email"
+                            type="email"
+                            value="{{ old('email', $user->email) }}"
+                            required
+                            maxlength="255"
+                            autocomplete="email"
+                            class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                        />
+                        <p class="mt-1 text-xs text-slate-500">{{ __('sa.dashboard.profile_email_reauth_hint') }}</p>
+                        @error('email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3">
-                        <dt class="text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_name') }}</dt>
-                        <dd class="mt-1 font-semibold text-slate-900">{{ $user->name ?: __('sa.generic.dash') }}</dd>
+                    <div>
+                        <label for="profile-name" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_name') }}</label>
+                        <input
+                            id="profile-name"
+                            name="name"
+                            type="text"
+                            value="{{ old('name', $user->name) }}"
+                            maxlength="255"
+                            autocomplete="name"
+                            class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                        />
+                        @error('name')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 sm:col-span-2">
-                        <dt class="text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_locale') }}</dt>
-                        <dd class="mt-1 text-lg font-bold tracking-wide text-slate-900">{{ $localeUiShort }}</dd>
+                    <div>
+                        <label for="profile-locale" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_locale') }}</label>
+                        <select
+                            id="profile-locale"
+                            name="locale"
+                            required
+                            class="mt-1.5 block w-full max-w-xs rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                        >
+                            @foreach (config('app.available_locales', ['ru', 'en', 'kk']) as $loc)
+                                <option value="{{ $loc }}" @selected(old('locale', $user->locale) === $loc)>{{ __('sa.locale_names.'.$loc) }}</option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-slate-500">{{ __('sa.dashboard.profile_locale_note') }}</p>
+                        @error('locale')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
-                </dl>
+                    <div class="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-4">
+                        <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_password_section') }}</p>
+                        <p class="mt-1 text-xs text-slate-600">{{ __('sa.dashboard.profile_password_hint') }}</p>
+                        <div class="mt-4 space-y-4">
+                            <div>
+                                <label for="profile-current-password" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_current_password') }}</label>
+                                <input
+                                    id="profile-current-password"
+                                    name="current_password"
+                                    type="password"
+                                    autocomplete="current-password"
+                                    class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                                />
+                                @error('current_password')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="profile-password" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_new_password') }}</label>
+                                <input
+                                    id="profile-password"
+                                    name="password"
+                                    type="password"
+                                    autocomplete="new-password"
+                                    class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                                />
+                                @error('password')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="profile-password-confirmation" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">{{ __('sa.dashboard.profile_new_password_confirm') }}</label>
+                                <input
+                                    id="profile-password-confirmation"
+                                    name="password_confirmation"
+                                    type="password"
+                                    autocomplete="new-password"
+                                    class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 focus:outline-none"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="rounded-xl bg-slate-800 px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-slate-700">
+                            {{ __('sa.dashboard.profile_save') }}
+                        </button>
+                    </div>
+                </form>
             </div>
         </section>
     </div>
@@ -209,7 +265,7 @@
 
             function hashKey() {
                 var h = window.location.hash;
-                if (!h || h === '#') return 'overview';
+                if (!h || h === '#') return 'projects';
                 return h.replace(/^#/, '');
             }
 

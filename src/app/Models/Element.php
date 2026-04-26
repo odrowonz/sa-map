@@ -25,7 +25,9 @@ class Element extends Model
         'artifact_key',
         'sort_order',
         'content',
-        'include_in_export',
+        'include_in_export_data',
+        'include_in_export_md',
+        'include_in_import',
     ];
 
     /**
@@ -37,7 +39,9 @@ class Element extends Model
             'level' => 'integer',
             'sort_order' => 'integer',
             'content' => 'array',
-            'include_in_export' => 'boolean',
+            'include_in_export_data' => 'boolean',
+            'include_in_export_md' => 'boolean',
+            'include_in_import' => 'boolean',
         ];
     }
 

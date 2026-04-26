@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ElementController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NjkTemplateController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectDataExchangeController;
 use App\Http\Controllers\ProjectWorkspaceController;
@@ -23,15 +24,18 @@ $routes = static function () use ($home) {
 
     Route::middleware('guest')->group(function () {
         Route::get('login', [LoginController::class, 'create'])->name('login');
-        Route::post('login', [LoginController::class, 'store']);
+        Route::post('login', [LoginController::class, 'store'])->middleware('throttle:login');
         Route::get('register', [RegisterController::class, 'create'])->name('register');
-        Route::post('register', [RegisterController::class, 'store']);
+        Route::post('register', [RegisterController::class, 'store'])->middleware('throttle:register');
     });
 
     Route::post('logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
 
     Route::middleware('auth')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::patch('profile', [ProfileController::class, 'update'])
+            ->middleware('throttle:profile-update')
+            ->name('profile.update');
         Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
         Route::get('projects/{project}', [ProjectWorkspaceController::class, 'show'])->name('projects.show');
         Route::get('projects/{project}/level/{level}', [ProjectWorkspaceController::class, 'level'])
@@ -44,7 +48,11 @@ $routes = static function () use ($home) {
         Route::get('projects/{project}/attachments/{attachment}/file', [AttachmentController::class, 'file'])->name('attachments.file');
         Route::delete('projects/{project}/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
         Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+        Route::get('projects/{project}/export-wizard-tree', [ProjectDataExchangeController::class, 'exportWizardTree'])
+            ->name('projects.export-wizard-tree');
         Route::post('projects/{project}/export-data', [ProjectDataExchangeController::class, 'export'])->name('projects.export-data');
+        Route::get('projects/{project}/njk-templates/{njk_template}/export-body', [NjkTemplateController::class, 'exportBody'])
+            ->name('projects.njk-templates.export-body');
         Route::post('projects/{project}/import-data', [ProjectDataExchangeController::class, 'import'])->name('projects.import-data');
 
         Route::get('njk-templates', [NjkTemplateController::class, 'index'])->name('njk-templates.index');

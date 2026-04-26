@@ -12,7 +12,7 @@ class NjkTemplateSeeder extends Seeder
         $templatePath = dirname(base_path()).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'template.njk';
         $mainBody = is_readable($templatePath)
             ? (string) file_get_contents($templatePath)
-            : "# {{ name | default(\"Project\") }}\n\n{# Minimal NJK placeholder #}\n";
+            : "# {{ project.name | default(\"Project\") }}\n\n{# Minimal NJK placeholder #}\n";
 
         NjkTemplate::query()->firstOrCreate(
             [
@@ -28,7 +28,7 @@ class NjkTemplateSeeder extends Seeder
         );
 
         $brdBody = <<<'NJK'
-# Бизнес-требования (BRD) — {{ name | default("Проект") }}
+# Бизнес-требования (BRD) — {{ project.name | default("Проект") }}
 
 *Предустановленный короткий шаблон. Редактирование на сервере; для своих вариантов создайте копию в «Мои шаблоны».*
 

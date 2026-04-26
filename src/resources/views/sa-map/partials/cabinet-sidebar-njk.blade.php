@@ -3,13 +3,8 @@
 @endphp
 <div class="space-y-0.5">
     <a
-        href="{{ $dash }}#overview"
-        class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
-    >
-        {{ __('sa.dashboard.nav_overview') }}
-    </a>
-    <a
         href="{{ $dash }}#projects"
+        data-cabinet-section="projects"
         class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
     >
         {{ __('sa.dashboard.nav_projects') }}
@@ -23,6 +18,7 @@
     </a>
     <a
         href="{{ $dash }}#profile"
+        data-cabinet-section="profile"
         class="cabinet-nav-link flex w-full items-center rounded-lg border-l-4 border-transparent px-3 py-2.5 text-left text-xs font-semibold text-slate-300 transition-colors hover:bg-slate-700/60"
     >
         {{ __('sa.dashboard.nav_profile') }}

@@ -2,7 +2,6 @@
     $c = $element?->content ?? [];
     $title = old('title', $c['title'] ?? '');
     $body = old('body', $c['body'] ?? '');
-    $include = old('include_in_export', $element?->include_in_export ?? true);
     $selectedUpstream = old('upstream_element_ids', $c['upstreamElementIds'] ?? []);
     if (! is_array($selectedUpstream)) {
         $selectedUpstream = [];
@@ -39,20 +38,6 @@
             class="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm shadow-sm focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
             placeholder="{{ __('sa.element.body_placeholder') }}"
         >{{ is_string($body) ? $body : '' }}</textarea>
-    </div>
-
-    <div class="flex flex-wrap items-center gap-4">
-        <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-            <input type="hidden" name="include_in_export" value="0" />
-            <input
-                type="checkbox"
-                name="include_in_export"
-                value="1"
-                class="rounded border-slate-300 text-slate-800 focus:ring-slate-500"
-                @checked(filter_var($include, FILTER_VALIDATE_BOOLEAN))
-            />
-            {{ __('sa.element.include_export') }}
-        </label>
     </div>
 
     @if ($level > 1)

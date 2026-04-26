@@ -93,28 +93,36 @@
             </p>
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-2">
-            <form method="post" action="{{ route('projects.export-data', $project) }}" class="inline">
-                @csrf
+            <button
+                type="button"
+                id="sa-export-data-btn"
+                class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50"
+                title="{{ __('sa.project_data.export_title') }}"
+            >
+                {{ __('sa.project_data.export') }}
+            </button>
+            @if ($njkTemplatesForMdExport->isNotEmpty())
                 <button
-                    type="submit"
-                    class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50"
-                    title="{{ __('sa.project_data.export_title') }}"
+                    type="button"
+                    id="sa-md-export-open"
+                    class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-emerald-800 shadow-sm hover:bg-emerald-100"
+                    title="{{ __('sa.project_data.export_md_title') }}"
                 >
-                    {{ __('sa.project_data.export') }}
+                    {{ __('sa.project_data.export_md') }}
                 </button>
-            </form>
+            @endif
             <form
+                id="sa-import-data-form"
                 method="post"
                 action="{{ route('projects.import-data', $project) }}"
                 enctype="multipart/form-data"
                 class="inline-flex flex-wrap items-center gap-2"
                 data-confirm="{{ __('sa.project_data.import_confirm') }}"
-                onsubmit="return confirm(this.dataset.confirm);"
             >
                 @csrf
                 <label class="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-600 shadow-sm hover:bg-slate-50">
                     <span>{{ __('sa.project_data.import_pick') }}</span>
-                    <input type="file" name="archive" accept=".zip,application/zip" class="hidden" required onchange="var b=this.form.querySelector('[data-import-submit]'); if(b) b.removeAttribute('disabled');" />
+                    <input type="file" name="archive" accept=".zip,application/zip" class="hidden" required onchange="(function(f){ var b=f.querySelector('[data-import-submit]'); if(b) b.removeAttribute('disabled'); ['import_element_ids','import_manifest_element_ids'].forEach(function(n){ var h=f.querySelector('input[name='+n+']'); if(h) h.remove(); }); })(this.form);" />
                 </label>
                 <button
                     type="submit"
@@ -202,9 +210,185 @@
             ])
         </article>
     </div>
+
+    @php
+        $wizardArtifacts = config('sa_map.artifacts', []);
+        $wizardLevelTitles = [];
+        foreach (range(1, 10) as $_wn) {
+            $wizardLevelTitles[$_wn] = (string) __('sa.map_levels.'.$_wn.'.title');
+        }
+        $wizardI18n = [
+            'wizard_title_export' => __('sa.project_data.wizard_title_export'),
+            'wizard_hint_export' => __('sa.project_data.wizard_hint_export'),
+            'wizard_title_export_md' => __('sa.project_data.wizard_title_export_md'),
+            'wizard_hint_export_md' => __('sa.project_data.wizard_hint_export_md'),
+            'wizard_title_import' => __('sa.project_data.wizard_title_import'),
+            'wizard_hint_import' => __('sa.project_data.wizard_hint_import'),
+            'wizard_continue' => __('sa.project_data.wizard_continue'),
+            'wizard_cancel' => __('sa.project_data.wizard_cancel'),
+            'wizard_close' => __('sa.project_data.wizard_close'),
+            'wizard_err_manifest' => __('sa.project_data.wizard_err_manifest'),
+            'wizard_err_empty' => __('sa.project_data.wizard_err_empty'),
+            'wizard_err_tree' => __('sa.project_data.wizard_err_tree'),
+        ];
+    @endphp
+    <div
+        id="sa-export-wizard-config"
+        class="hidden"
+        data-tree-url="{{ route('projects.export-wizard-tree', $project) }}"
+        data-export-url="{{ route('projects.export-data', $project) }}"
+        data-json-name="{{ e(\App\Services\ProjectDataExchangeService::exportManifestJsonName($project)) }}"
+        data-legacy-json="{{ e(\App\Services\ProjectDataExchangeService::LEGACY_JSON_NAME) }}"
+    ></div>
+    <script type="application/json" id="sa-element-wizard-flags">
+        {!! json_encode($elementWizardFlags ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS) !!}
+    </script>
+    <script type="application/json" id="sa-export-wizard-artifacts">
+        {!! json_encode($wizardArtifacts, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS) !!}
+    </script>
+    <script type="application/json" id="sa-export-wizard-level-titles">
+        {!! json_encode($wizardLevelTitles, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS) !!}
+    </script>
+    <script type="application/json" id="sa-export-wizard-i18n">
+        {!! json_encode($wizardI18n, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS) !!}
+    </script>
+    <div
+        id="sa-export-wizard-modal"
+        class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/50 p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sa-export-wizard-title"
+        aria-hidden="true"
+    >
+        <div class="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+            <div class="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-5 py-4">
+                <div class="min-w-0">
+                    <h2 id="sa-export-wizard-title" class="text-base font-bold text-slate-900"></h2>
+                    <p id="sa-export-wizard-hint" class="mt-1 text-xs text-slate-600"></p>
+                </div>
+                <button
+                    type="button"
+                    id="sa-export-wizard-close"
+                    class="rounded-lg p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                    aria-label="{{ __('sa.project_data.wizard_close') }}"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="sa-export-wizard-tree" class="min-h-0 flex-1 overflow-y-auto px-5 py-3"></div>
+            <div class="flex shrink-0 flex-wrap justify-end gap-2 border-t border-slate-100 px-5 py-4">
+                <button
+                    type="button"
+                    id="sa-export-wizard-cancel"
+                    class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-600 hover:bg-slate-50"
+                >
+                    {{ __('sa.project_data.wizard_cancel') }}
+                </button>
+                <button
+                    type="button"
+                    id="sa-export-wizard-continue"
+                    class="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-sm hover:bg-blue-700"
+                >
+                    {{ __('sa.project_data.wizard_continue') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if ($njkTemplatesForMdExport->isNotEmpty())
+        @php
+            $dummyNjkId = ((int) (\App\Models\NjkTemplate::query()->max('id') ?? 0)) + 1_000_000;
+            $mdExportTemplateUrlTpl = preg_replace(
+                '#(/njk-templates/)\d+(/export-body)$#',
+                '$1__TEMPLATE_ID__$2',
+                route('projects.njk-templates.export-body', [$project, $dummyNjkId])
+            ) ?? route('projects.njk-templates.export-body', [$project, $dummyNjkId]);
+            $mdExportI18n = [
+                'pick_template' => __('sa.project_data.export_md_pick'),
+                'config' => __('sa.project_data.export_md_config'),
+                'busy' => __('sa.project_data.export_md_busy'),
+                'error_zip' => __('sa.project_data.export_md_error_zip'),
+                'error_json' => __('sa.project_data.export_md_error_json'),
+                'error_json_parse' => __('sa.project_data.export_md_error_json_parse'),
+                'error_template' => __('sa.project_data.export_md_error_template'),
+                'error_render' => __('sa.project_data.export_md_error_render'),
+                'error_network' => __('sa.project_data.export_md_error_network'),
+            ];
+        @endphp
+        <div
+            id="sa-md-export-config"
+            class="hidden"
+            data-export-post="{{ route('projects.export-data', $project) }}"
+            data-json-name="{{ e(\App\Services\ProjectDataExchangeService::exportManifestJsonName($project)) }}"
+            data-md-name="{{ e(\App\Services\ProjectDataExchangeService::exportManifestMdName($project)) }}"
+            data-template-url-tpl="{{ $mdExportTemplateUrlTpl }}"
+        ></div>
+        <script type="application/json" id="sa-md-export-bridge">
+            {!! json_encode($mdTemplateLegacyBridge, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS) !!}
+        </script>
+        <script type="application/json" id="sa-md-export-i18n">
+            {!! json_encode($mdExportI18n, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS) !!}
+        </script>
+        <div
+            id="sa-md-export-modal"
+            class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sa-md-export-title"
+            aria-hidden="true"
+        >
+            <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+                <div class="flex items-start justify-between gap-3">
+                    <h2 id="sa-md-export-title" class="text-base font-bold text-slate-900">{{ __('sa.project_data.export_md_modal_title') }}</h2>
+                    <button
+                        type="button"
+                        id="sa-md-export-close"
+                        class="rounded-lg p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                        aria-label="{{ __('sa.project_data.export_md_close') }}"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <p class="mt-2 text-xs text-slate-600">{{ __('sa.project_data.export_md_modal_hint') }}</p>
+                <label for="sa-md-export-template" class="mt-4 block text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    {{ __('sa.project_data.export_md_template_label') }}
+                </label>
+                <select
+                    id="sa-md-export-template"
+                    class="mt-1.5 block w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 focus:outline-none"
+                >
+                    <option value="">{{ __('sa.project_data.export_md_template_placeholder') }}</option>
+                    @foreach ($njkTemplatesForMdExport as $tpl)
+                        <option value="{{ $tpl->id }}">{{ $tpl->title }}</option>
+                    @endforeach
+                </select>
+                <p id="sa-md-export-error" class="mt-3 hidden text-sm text-red-600" role="alert"></p>
+                <div class="mt-6 flex flex-wrap justify-end gap-2">
+                    <button
+                        type="button"
+                        id="sa-md-export-cancel"
+                        class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-600 hover:bg-slate-50"
+                    >
+                        {{ __('sa.project_data.export_md_cancel') }}
+                    </button>
+                    <button
+                        type="button"
+                        id="sa-md-export-run"
+                        class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-sm hover:bg-emerald-700"
+                    >
+                        {{ __('sa.project_data.export_md_download') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 
 @push('scripts')
+    @vite(['resources/js/project-export-wizard.js'])
+    @if ($njkTemplatesForMdExport->isNotEmpty())
+        @vite(['resources/js/project-md-export.js'])
+    @endif
     <script>
         (function () {
             var article = document.querySelector('#workspace-main-scroll article[data-artifact-filter]');

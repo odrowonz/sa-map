@@ -44,7 +44,11 @@
         <div class="mb-4 flex flex-wrap items-center gap-2">
             @if ($template->is_system)
                 <span class="inline-flex items-center rounded-full bg-sky-200/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-sky-950">{{ __('sa.njk.badge_system') }}</span>
-                <span class="inline-flex items-center rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700">{{ __('sa.njk.readonly_badge') }}</span>
+                @cannot('update', $template)
+                    <span class="inline-flex items-center rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700">{{ __('sa.njk.readonly_badge') }}</span>
+                @endcannot
+            @elseif (auth()->user()->isAdmin() && $template->user_id !== auth()->id())
+                <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-950">{{ __('sa.njk.badge_user') }}</span>
             @else
                 <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-900">{{ __('sa.njk.badge_own') }}</span>
             @endif

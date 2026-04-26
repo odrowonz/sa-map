@@ -49,6 +49,7 @@ function validateNjk(src) {
             autoescape: false,
             throwOnUndefined: false,
         });
+        env.addFilter('md_file_icon', () => '');
         new nunjucks.Template(src, env, null, true);
         return { ok: true, message: '' };
     } catch (err) {

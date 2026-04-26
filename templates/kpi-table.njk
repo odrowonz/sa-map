@@ -1,0 +1,29 @@
+# Табличный обзор записей: {{ project.name | default("Проект") }}
+*Экспорт: {{ exported_at }}*
+
+{# В манифесте есть elements[] — плоский список записей с include_in_export. #}
+{# У каждой: artifact_key (например L1_kpis), content.title, content.body, attachments[]. #}
+{# Скопируйте блок таблицы и замените "L1_kpis" на свой ключ из конфигурации артефактов. #}
+
+## KPI (`L1_kpis`)
+
+| Название | Описание | Вложения (пути в ZIP) |
+| --- | --- | --- |
+{%- for el in elements %}
+{%- if el.artifact_key == "L1_kpis" %}
+| {{ el.content.title | default("") | replace("|", "·") }} | {{ el.content.body | default("") | replace("\n", " ") | replace("|", "·") }} | {% for a in el.attachments or [] %}{{ a | md_file_icon }}[{{ a.original_name | default("file") | replace("|", "·") }}]({{ a.zip_path }}){% if not loop.last %} · {% endif %}{% else %}—{% endfor %} |
+{%- endif %}
+{%- endfor %}
+
+## User stories (`L4_user_stories`)
+
+| Название | Описание | Вложения |
+| --- | --- | --- |
+{%- for el in elements %}
+{%- if el.artifact_key == "L4_user_stories" %}
+| {{ el.content.title | default("") | replace("|", "·") }} | {{ el.content.body | default("") | replace("\n", " ") | replace("|", "·") }} | {% for a in el.attachments or [] %}{{ a | md_file_icon }}[{{ a.original_name | default("file") | replace("|", "·") }}]({{ a.zip_path }}){% if not loop.last %} · {% endif %}{% else %}—{% endfor %} |
+{%- endif %}
+{%- endfor %}
+
+---
+*Шаблон `kpi-table.njk`: таблицы по `elements` + ссылки на все вложения в архиве.*

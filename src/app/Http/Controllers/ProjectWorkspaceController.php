@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Element;
+use App\Models\NjkTemplate;
 use App\Models\Project;
+use App\Services\ProjectDataExchangeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -22,8 +24,6 @@ class ProjectWorkspaceController extends Controller
     {
         $this->authorize('view', $project);
         abort_unless($level >= 1 && $level <= 10, 404);
-
-        $levels = config('sa_map.levels');
 
         $artifacts = config('sa_map.artifacts.'.$level);
         if (! is_array($artifacts)) {
@@ -62,15 +62,41 @@ class ProjectWorkspaceController extends Controller
             $artifactFilterLabel = is_array($match) ? ($match['label'] ?? $artifactFilter) : $artifactFilter;
         }
 
+        $njkForExport = NjkTemplate::query()->orderByDesc('is_system')->orderBy('title');
+        if (! $request->user()->isAdmin()) {
+            $njkForExport->where(function ($q) use ($request): void {
+                $q->where('is_system', true)
+                    ->orWhere('user_id', $request->user()->id);
+            });
+        }
+        $njkTemplatesForMdExport = $njkForExport->get(['id', 'title']);
+
+        $elementWizardFlags = [];
+        foreach (Element::query()
+            ->where('project_id', $project->id)
+            ->get(['id', 'include_in_export_data', 'include_in_export_md', 'include_in_import']) as $el) {
+            $elementWizardFlags[(string) $el->id] = [
+                'export_data' => (bool) $el->include_in_export_data,
+                'export_md' => (bool) $el->include_in_export_md,
+                'import' => (bool) $el->include_in_import,
+            ];
+        }
+
         return view('sa-map.project.level', [
             'project' => $project,
             'level' => $level,
-            'levelMeta' => $levels[$level],
+            'levelMeta' => [
+                'title' => __('sa.map_levels.'.$level.'.title'),
+                'question' => __('sa.map_levels.'.$level.'.question'),
+            ],
             'artifacts' => $artifacts,
             'artifactFilter' => $artifactFilter,
             'artifactFilterLabel' => $artifactFilterLabel,
             'elementsByArtifact' => $elementsByArtifact,
             'upstreamElements' => $upstreamElements,
+            'njkTemplatesForMdExport' => $njkTemplatesForMdExport,
+            'mdTemplateLegacyBridge' => ProjectDataExchangeService::mdTemplateLegacyBridge(),
+            'elementWizardFlags' => $elementWizardFlags,
         ]);
     }
 }
